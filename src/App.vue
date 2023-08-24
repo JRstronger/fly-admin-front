@@ -7,27 +7,30 @@
 <script setup>
 import requestUtil from "@/util/request";
 import store from "./store";
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+const route = useRoute();
+const router = useRouter();
+const whitePath = ["/login", "/index", "/"];
 
-// const handleLogin = async () => {
-//   let result = await requestUtil.get("test/login");
-//   let data = result.data;
-//   if (data.code == 200) {
-//     const token = data.token;
-//     console.log("登录成功！,token", token);
-//     store.commit("SET_TOKEN", token);
-//   } else {
-//     console.log("登录出错！");
-//   }
-// };
+watch(
+  route,
+  (to, from) => {
+    console.log("to" + to.name);
+    console.log(to.path);
 
-// const handleUserList = async () => {
-//   let result = await requestUtil.get("test/user/list");
-//   let data = result.data;
-//   if (data.code == 200) {
-//     const userList = data.userList;
-//     console.log("用户信息列表:userList=", userList);
-//   }
-// };
+    if (whitePath.indexOf(to.path) === -1) {
+      console.log("to.path=" + to.path);
+      let obj = {
+        name: to.name,
+        path: to.path,
+      };
+
+      store.commit("ADD_TABS", obj);
+    }
+  },
+  { deep: true, immediate: true }
+);
 </script>
 <style>
 html,

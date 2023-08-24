@@ -1,4 +1,4 @@
-<template>用户管理</template>
+<template>管理</template>
 
 <script setup>
 </script>

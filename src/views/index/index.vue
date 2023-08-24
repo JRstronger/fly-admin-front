@@ -1,4 +1,4 @@
-<template>首页</template>
+<template>首页3232323</template>
 
 <script>
 export default {
