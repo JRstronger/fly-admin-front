@@ -1,11 +1,16 @@
 <template>
   <div class="app-wrapper">
     <el-container>
-      <el-aside width="200px" class="sidebar-container"><Menu /></el-aside>
+      <el-header><Header /></el-header>
       <el-container>
-        <el-header><Header /></el-header>
-        <el-main><Tabs /></el-main>
-        <el-footer><Footer /></el-footer>
+        <el-aside width="200px" class="sidebar-container"><Menu /></el-aside>
+        <el-container>
+          <el-main
+            ><Tabs />
+            <router-view />
+          </el-main>
+          <el-footer><Footer /></el-footer>
+        </el-container>
       </el-container>
     </el-container>
   </div>
@@ -28,7 +33,7 @@ import Tabs from "@/layout/tabs";
 }
 
 .sidebar-container {
-  background-color: #2d3a4b;
+  background-color: black;
   height: 100%;
 }
 

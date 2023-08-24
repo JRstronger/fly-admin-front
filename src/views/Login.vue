@@ -111,8 +111,11 @@ const handleLogin = () => {
           //将token放到session中
           const token = data.authorization;
           const menuList = data.menuList;
-          console.log("menuList", menuList);
+          const currentUser = data.currentUser;
+          console.log("currentUser=", currentUser);
 
+          console.log("menuList=", menuList);
+          store.commit("SET_USERINFO", currentUser);
           store.commit("SET_MENULIST", menuList);
           store.commit("SET_TOKEN", token);
           //跳转到后端首页

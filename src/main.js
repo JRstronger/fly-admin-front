@@ -9,7 +9,7 @@ import '@/assets/styles/border.css'
 import '@/assets/styles/reset.css'
 import SvgIcon from '@/icons'
 import '@/assets/font/font_f.css'
-
+import "@/router/permission.js"
 
 const app = createApp(App)
 SvgIcon(app);

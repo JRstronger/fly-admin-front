@@ -1,5 +1,6 @@
 <template>
   <div style="margin-bottom: 20px">
+    <Breadcrumb />
     <el-button size="small" @click="addTab(editableTabsValue)">
       add tab
     </el-button>
@@ -23,6 +24,7 @@
 </template>
 <script  setup>
 import { ref } from "vue";
+import Breadcrumb from "./components/breadcrumb.vue";
 
 let tabIndex = 2;
 const editableTabsValue = ref("2");
@@ -69,7 +71,7 @@ const removeTab = (targetName) => {
 <style>
 .demo-tabs > .el-tabs__content {
   padding: 32px;
-  color: #6b778c;
+  color: black;
   font-size: 32px;
   font-weight: 600;
 }
