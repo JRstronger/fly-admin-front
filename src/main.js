@@ -10,6 +10,8 @@ import '@/assets/styles/reset.css'
 import SvgIcon from '@/icons'
 import '@/assets/font/font_f.css'
 import "@/router/permission.js"
+// 国际化中文
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
 const app = createApp(App)
 SvgIcon(app);
@@ -17,5 +19,8 @@ app.use(store)
 app.use(router)
 app.use(ElementPlus)
 app.mount('#app')
+app.use(ElementPlus, {
+    locale: zhCn,
+})
 
 // createApp(App).use(store).use(router).use(ElementPlus).mount('#app')
