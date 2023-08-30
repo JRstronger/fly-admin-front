@@ -3,27 +3,17 @@
     <el-row :gutter="20" class="header">
       <el-col :span="7">
         <el-input
-          placeholder="请输入角色名..."
+          placeholder="请输入流程名称..."
           v-model="queryForm.query"
           clearable
         ></el-input>
       </el-col>
-      <el-button type="primary" :icon="Search" @click="initRoleList"
+      <el-button type="primary" :icon="Search" @click="initUserList"
         >搜索</el-button
       >
       <el-button type="success" :icon="DocumentAdd" @click="handleDialogValue()"
-        >新增</el-button
+        >创建审批流</el-button
       >
-      <el-popconfirm
-        title="您确定批量删除这些记录吗？"
-        @confirm="handleDelete(null)"
-      >
-        <template #reference>
-          <el-button type="danger" :disabled="delBtnStatus" :icon="Delete"
-            >批量删除</el-button
-          >
-        </template>
-      </el-popconfirm>
     </el-row>
 
     <el-table
@@ -32,50 +22,58 @@
       style="width: 100%"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="name" label="角色名" width="100" align="center" />
       <el-table-column
-        prop="code"
-        label="权限字符"
+        prop="process_name"
+        label="流程名称"
+        width="100"
+        align="center"
+      />
+      <el-table-column
+        prop="process_status"
+        label="流程状态"
+        width="200"
+        align="center"
+      >
+      </el-table-column>
+      <el-table-column
+        prop="apply_user_id"
+        label="流程发起者"
         width="200"
         align="center"
       />
       <el-table-column
-        prop="createTime"
+        prop="current_step_id"
+        label="当前步骤节点"
+        width="200"
+        align="center"
+      />
+      <el-table-column
+        prop="created_by"
+        label="创建人"
+        width="200"
+        align="center"
+      />
+      <el-table-column
+        prop="created_dt"
         label="创建时间"
         width="200"
         align="center"
       />
-      <el-table-column prop="remark" label="备注" />
       <el-table-column
-        prop="action"
-        label="操作"
-        width="400"
+        prop="created_dt"
+        label="进度"
+        width="150"
         fixed="right"
         align="center"
       >
         <template v-slot="scope">
           <el-button
+            @click="drawer = true"
             type="primary"
-            :icon="Tools"
-            @click="handleMenuDialogValue(scope.row.id)"
-            >分配权限</el-button
+            style="margin-left: 16px"
           >
-          <el-button
-            v-if="scope.row.code != 'admin'"
-            type="primary"
-            :icon="Edit"
-            @click="handleDialogValue(scope.row.id)"
-          />
-          <el-popconfirm
-            v-if="scope.row.code != 'admin'"
-            title="您确定要删除这条记录吗？"
-            @confirm="handleDelete(scope.row.id)"
-          >
-            <template #reference>
-              <el-button type="danger" :icon="Delete" />
-            </template>
-          </el-popconfirm>
+            查看进度
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -92,16 +90,11 @@
   <Dialog
     v-model="dialogVisible"
     :dialogVisible="dialogVisible"
-    :id="id"
     :dialogTitle="dialogTitle"
-    @initRoleList="initRoleList"
   />
-  <MenuDialog
-    v-model="menuDialogVisible"
-    :menuDialogVisible="menuDialogVisible"
-    :id="id"
-    @initRoleList="initRoleList"
-  ></MenuDialog>
+
+  <el-drawer title="我是外面的 Drawer" :visible.sync="true" size="50%">
+  </el-drawer>
 </template>
 
 <script setup>
@@ -117,9 +110,15 @@ import {
 } from "@element-plus/icons-vue";
 import Dialog from "./components/dialog";
 import { ElMessage, ElMessageBox } from "element-plus";
-import MenuDialog from "./components/menuDialog";
-import { getRoleList, deleteByIds } from "@/api/sys/role";
+import RoleDialog from "./components/roleDialog";
+import {
+  getUserList,
+  deleteUserById,
+  resetPassword,
+  updateStatus,
+} from "@/api/sys/user";
 
+const drawer = ref(false);
 const tableData = ref([]);
 
 const total = ref(0);
@@ -142,7 +141,7 @@ const multipleSelection = ref([]);
 
 const sysRoleList = ref([]);
 
-const menuDialogVisible = ref(false);
+const roleDialogVisible = ref(false);
 
 const handleSelectionChange = (selection) => {
   console.log("勾选了");
@@ -151,40 +150,34 @@ const handleSelectionChange = (selection) => {
   delBtnStatus.value = selection.length == 0;
 };
 
-const handleMenuDialogValue = (roleId) => {
-  console.log("roleId=" + roleId);
-  id.value = roleId;
-  menuDialogVisible.value = true;
+const handleRoleDialogValue = (userId, roleList) => {
+  console.log("userId=" + userId);
+  id.value = userId;
+  sysRoleList.value = roleList;
+  roleDialogVisible.value = true;
 };
 
-const initRoleList = async () => {
-  // const res = await requestUtil.post("sys/role/list", queryForm.value);
-  const res = await getRoleList(queryForm.value);
-  tableData.value = res.data.roleList;
+const initUserList = async () => {
+  // const res = await requestUtil.post("sys/user/list", queryForm.value);
+  const res = await getUserList(queryForm.value);
+  tableData.value = res.data.userList;
   total.value = res.data.total;
 };
 
-initRoleList();
+initUserList();
 
 const handleSizeChange = (pageSize) => {
   queryForm.value.pageNum = 1;
   queryForm.value.pageSize = pageSize;
-  initRoleList();
+  initUserList();
 };
 
 const handleCurrentChange = (pageNum) => {
   queryForm.value.pageNum = pageNum;
-  initRoleList();
+  initUserList();
 };
 
-const handleDialogValue = (roleId) => {
-  if (roleId) {
-    id.value = roleId;
-    dialogTitle.value = "角色修改";
-  } else {
-    id.value = -1;
-    dialogTitle.value = "角色添加";
-  }
+const handleDialogValue = (userId) => {
   dialogVisible.value = true;
 };
 
@@ -197,14 +190,14 @@ const handleDelete = async (id) => {
       ids.push(row.id);
     });
   }
-  // const res = await requestUtil.post("sys/role/delete", ids)
-  const res = await deleteByIds(ids);
+  // const res = await requestUtil.post("sys/user/delete", ids);
+  const res = await deleteUserById(ids);
   if (res.data.code == 200) {
     ElMessage({
       type: "success",
       message: "执行成功!",
     });
-    initRoleList();
+    initUserList();
   } else {
     ElMessage({
       type: "error",
@@ -214,14 +207,14 @@ const handleDelete = async (id) => {
 };
 
 const handleResetPassword = async (id) => {
-  // const res = await requestUtil.get("sys/role/resetPassword/" + id);
+  // const res = await requestUtil.get("sys/user/resetPassword/" + id);
   const res = await resetPassword(id);
   if (res.data.code == 200) {
     ElMessage({
       type: "success",
       message: "执行成功!",
     });
-    initRoleList();
+    initUserList();
   } else {
     ElMessage({
       type: "error",
@@ -231,7 +224,7 @@ const handleResetPassword = async (id) => {
 };
 
 const statusChangeHandle = async (row) => {
-  // let res = await requestUtil.get("sys/role/updateStatus/" + row.id + "/status/" + row.status);
+  //let res = await requestUtil.get("sys/user/updateStatus/" + row.id + "/status/" + row.status);
   let res = await updateStatus(row.id, row.status);
   if (res.data.code == 200) {
     ElMessage({
@@ -243,7 +236,7 @@ const statusChangeHandle = async (row) => {
       type: "error",
       message: res.data.msg,
     });
-    initRoleList();
+    initUserList();
   }
 };
 </script>

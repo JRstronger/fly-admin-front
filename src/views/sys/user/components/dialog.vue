@@ -48,6 +48,7 @@
 import { defineEmits, defineProps, ref, watch } from "vue";
 import requestUtil, { getServerUrl } from "@/util/request";
 import { ElMessage } from "element-plus";
+import { queryUserById, checkUserName, saveUserInfo } from "@/api/sys/user";
 
 const props = defineProps({
   id: {
@@ -79,9 +80,10 @@ const form = ref({
 
 const checkUsername = async (rule, value, callback) => {
   if (form.value.id == -1) {
-    const res = await requestUtil.post("sys/user/checkUserName", {
-      username: form.value.username,
-    });
+    // const res = await requestUtil.post("sys/user/checkUserName", {
+    //   username: form.value.username,
+    // });
+    const res = await checkUserName(form.value.username);
     if (res.data.code == 500) {
       callback(new Error("用户名已存在！"));
     } else {
@@ -118,7 +120,8 @@ const rules = ref({
 const formRef = ref(null);
 
 const initFormData = async (id) => {
-  const res = await requestUtil.get("sys/user/" + id);
+  // const res = await requestUtil.get("sys/user/" + id);
+  const res = await queryUserById(id);
   form.value = res.data.sysUser;
 };
 
@@ -152,7 +155,8 @@ const handleClose = () => {
 const handleConfirm = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
-      let result = await requestUtil.post("sys/user/save", form.value);
+      // let result = await requestUtil.post("sys/user/save", form.value);
+      let result = await saveUserInfo(form.value);
       let data = result.data;
       if (data.code == 200) {
         ElMessage.success("执行成功！");

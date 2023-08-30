@@ -1,10 +1,18 @@
-<template>首页3232323</template>
+<template>
+  <el-button @click="drawer = true" type="primary" style="margin-left: 16px">
+    点我打开
+  </el-button>
 
+  <el-drawer title="我是标题" :visible.sync="drawer" :with-header="false">
+    <span>我来啦!</span>
+  </el-drawer>
+</template>
 <script>
 export default {
-  name: "index",
+  data() {
+    return {
+      drawer: false,
+    };
+  },
 };
 </script>
-
-<style scoped>
-</style>

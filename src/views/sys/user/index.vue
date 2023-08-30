@@ -174,6 +174,12 @@ import {
 import Dialog from "./components/dialog";
 import { ElMessage, ElMessageBox } from "element-plus";
 import RoleDialog from "./components/roleDialog";
+import {
+  getUserList,
+  deleteUserById,
+  resetPassword,
+  updateStatus,
+} from "@/api/sys/user";
 
 const tableData = ref([]);
 
@@ -214,7 +220,8 @@ const handleRoleDialogValue = (userId, roleList) => {
 };
 
 const initUserList = async () => {
-  const res = await requestUtil.post("sys/user/list", queryForm.value);
+  // const res = await requestUtil.post("sys/user/list", queryForm.value);
+  const res = await getUserList(queryForm.value);
   tableData.value = res.data.userList;
   total.value = res.data.total;
 };
@@ -252,7 +259,8 @@ const handleDelete = async (id) => {
       ids.push(row.id);
     });
   }
-  const res = await requestUtil.post("sys/user/delete", ids);
+  // const res = await requestUtil.post("sys/user/delete", ids);
+  const res = await deleteUserById(ids);
   if (res.data.code == 200) {
     ElMessage({
       type: "success",
@@ -268,7 +276,8 @@ const handleDelete = async (id) => {
 };
 
 const handleResetPassword = async (id) => {
-  const res = await requestUtil.get("sys/user/resetPassword/" + id);
+  // const res = await requestUtil.get("sys/user/resetPassword/" + id);
+  const res = await resetPassword(id);
   if (res.data.code == 200) {
     ElMessage({
       type: "success",
@@ -284,9 +293,8 @@ const handleResetPassword = async (id) => {
 };
 
 const statusChangeHandle = async (row) => {
-  let res = await requestUtil.get(
-    "sys/user/updateStatus/" + row.id + "/status/" + row.status
-  );
+  //let res = await requestUtil.get("sys/user/updateStatus/" + row.id + "/status/" + row.status);
+  let res = await updateStatus(row.id, row.status);
   if (res.data.code == 200) {
     ElMessage({
       type: "success",

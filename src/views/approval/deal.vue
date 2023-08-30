@@ -1,4 +1,4 @@
-<template>职位管理</template>
+<template>制备管理</template>
 
 <script setup>
 </script>
