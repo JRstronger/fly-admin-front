@@ -1,21 +1,18 @@
 <template>
   <div class="app-wrapper">
     <el-container>
-      <el-header><Header /></el-header>
+      <el-aside width="200px" class="sidebar-container"><Menu /></el-aside>
       <el-container>
-        <el-aside width="200px" class="sidebar-container"><Menu /></el-aside>
-        <el-container>
-          <el-main
-            ><Tabs />
-            <router-view />
-          </el-main>
-          <el-footer><Footer /></el-footer>
-        </el-container>
+        <el-header><Header /></el-header>
+        <el-main>
+          <Tabs />
+          <router-view />
+        </el-main>
+        <el-footer><Footer /></el-footer>
       </el-container>
     </el-container>
   </div>
 </template>
-
 
 <script setup>
 import Menu from "@/layout/menu";

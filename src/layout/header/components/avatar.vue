@@ -34,8 +34,10 @@ const logout = async () => {
   let result = await requestUtil.get("/logout");
   if (result.data.code == 200) {
     store.commit("SET_ROUTES_STATE", false);
+    store.commit("SET_TOKEN", "");
     store.commit("RESET_TABS");
     store.dispatch("logout");
+    console.log("token=", store.getters.GET_TOKEN);
   }
 };
 </script>

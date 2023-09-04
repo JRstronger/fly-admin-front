@@ -1,7 +1,7 @@
 <template>
-  <!-- <el-icon><HomeFilled /></el-icon> -->
+  <el-icon><HomeFilled /></el-icon>
   <el-breadcrumb separator=">">
-    <el-breadcrumb-item v-for="(item, index) in breadcrumbList">
+    <el-breadcrumb-item v-for="(item, index) in breadcrumbList" link>
       <span class="root" v-if="parentName && index > 0"
         >{{ parentName }}&nbsp;&nbsp;/&nbsp;&nbsp;</span
       >
@@ -39,6 +39,5 @@ watch(
 .root {
   color: #666;
   font-weight: 400;
-  line-height: 40px;
 }
 </style>

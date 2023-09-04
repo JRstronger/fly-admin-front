@@ -93,7 +93,8 @@
     :dialogTitle="dialogTitle"
   />
 
-  <el-drawer title="我是外面的 Drawer" :visible.sync="true" size="50%">
+  <el-drawer v-model="drawer" size="40%">
+    <div>流程进度</div>
   </el-drawer>
 </template>
 

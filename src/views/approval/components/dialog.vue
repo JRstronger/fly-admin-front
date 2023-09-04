@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="dialogTitle" width="80%" @close="handleClose">
+  <el-dialog width="80%">
     <el-steps :active="active" finish-status="success">
       <el-step title="步骤 1" description="填写申请信息"></el-step>
       <el-step title="步骤 2" description="选择审批人/抄送人"></el-step>
@@ -12,215 +12,358 @@
       <el-col :span="8">
         <el-form ref="form" :model="form" label-width="80px">
           <el-form-item label="流程名称">
-            <el-input v-model="form.name"></el-input>
+            <el-input v-model="form.process_name"></el-input>
           </el-form-item>
           <el-form-item label="申请人">
-            <el-input v-model="form.name"></el-input>
+            <el-input v-model="form.apply_user_id"></el-input>
           </el-form-item>
           <el-form-item label="申请理由">
-            <el-input type="textarea" v-model="form.desc"></el-input>
+            <el-input type="textarea" v-model="form.apply_reason"></el-input>
           </el-form-item>
         </el-form>
       </el-col>
 
-      <el-col :span="8">
-        <!-- <el-radio v-model="radio" label="1">会签（所有人都同意即可）</el-radio>
-        <el-radio v-model="radio" label="2">或签（任意一个同意即可）</el-radio> -->
+      <!-- 步骤2 -->
+      <el-col :span="10">
         <el-form-item label="选择审批模板">
           <el-select
-            v-model="value"
-            filterable
-            placeholder="选择审批模板..."
-            @change="handleChangeModel"
+            v-model="approval_module_value"
+            placeholder="请选择审批模版..."
+            @change="handleChange(approval_module_value)"
           >
             <el-option
-              v-for="item in approval_model"
+              v-for="item in approval_module_data"
               :key="item.value"
               :label="item.label"
               :value="item.value"
-            >
-            </el-option> </el-select
-        ></el-form-item>
-
-        <el-select
-          v-model="current_value"
-          filterable
-          v-for="item2 in current_approval_model"
-          :key="item2.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          v-for="item2 in current_approval_module_data"
           :label="item2.label"
+          :key="item2.value"
           :value="item2.value"
         >
-          <el-option
-            v-for="item3 in current_approval_model"
-            :key="item3.value"
-            :label="item3.label"
-            :value="item3.value"
+          <el-select
+            v-model="item2.approver_input_selected"
+            multiple
+            collapse-tags
+            collapse-tags-tooltip
+            :max-collapse-tags="3"
+            placeholder="请选择审批人..."
+            style="width: 240px"
           >
-          </el-option>
-        </el-select>
+            <el-option
+              v-for="item in select_approver_options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          <span>&nbsp;</span>
+          <el-popover placement="right" :width="400" trigger="click">
+            <template #reference>
+              <el-button type="primary" :icon="Edit" circle size="small" />
+            </template>
+            <div>
+              <el-radio-group v-model="approver_node_type_radio">
+                <el-radio label="1" border>会签（所有人都同意即可）</el-radio>
+                <br />
+                <el-radio label="2" border>或签（任意一个同意即可）</el-radio>
+              </el-radio-group>
+              <br />
+              <el-form-item label="抄送至">
+                <el-select
+                  v-model="approver_input_selected"
+                  multiple
+                  collapse-tags
+                  collapse-tags-tooltip
+                  :max-collapse-tags="3"
+                  placeholder="请选择抄送给..."
+                  style="width: 240px"
+                >
+                  <el-option
+                    v-for="item in select_approver_options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </div>
+          </el-popover>
+          <span>&nbsp;&nbsp;</span>
+          <el-form-item>
+            <el-tooltip
+              class="box-item"
+              effect="light"
+              content="在此下方添加审批节点"
+              placement="top-start"
+            >
+              <el-icon
+                @click="HandleAddOrDelApprovalNode(item2.value, 'add')"
+                size="large"
+                ><CirclePlus
+              /></el-icon>
+            </el-tooltip>
+          </el-form-item>
+          <span>&nbsp;&nbsp;</span>
+          <el-form-item>
+            <el-tooltip
+              class="box-item"
+              effect="light"
+              content="删除当前审批节点"
+              placement="top-start"
+            >
+              <el-icon
+                @click="HandleAddOrDelApprovalNode(item2.value, 'del')"
+                size="large"
+                ><CircleClose
+              /></el-icon>
+            </el-tooltip>
+          </el-form-item>
+        </el-form-item>
+        <br />
+        <el-button style="margin-top: 50px; margin-left: 80px" @click="back"
+          >上一步</el-button
+        >
+        <el-button style="margin-top: 50px" @click="next">下一步</el-button>
+        <el-button style="margin-top: 50px" @click="CreateApproveProcess"
+          >創建流程</el-button
+        >
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-upload
+          v-model:file-list="fileList"
           class="upload-demo"
-          ref="upload"
-          action="https://jsonplaceholder.typicode.com/posts/"
+          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+          multiple
           :on-preview="handlePreview"
           :on-remove="handleRemove"
-          :file-list="fileList"
-          :auto-upload="false"
+          :before-remove="beforeRemove"
+          :limit="3"
+          :on-exceed="handleExceed"
         >
-          <el-button slot="trigger" size="small" type="primary"
-            >选取文件</el-button
-          >
-          <el-button
-            style="margin-left: 10px"
-            size="small"
-            type="success"
-            @click="submitUpload"
-            >上传到服务器</el-button
-          ><br />
-        </el-upload>
-      </el-col>
+          <el-button type="primary">点击上传附件</el-button>
+          <template #tip> </template> </el-upload
+      ></el-col>
     </el-row>
   </el-dialog>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      current_approval_model: [
-        {
-          value: "fly",
-          label: "飞流",
-        },
-      ],
-      current_value: "",
-      approval_model: [
-        {
-          value: "default",
-          label: "默认模板",
-          child_node: [
-            {
-              value: "fly",
-              label: "飞流",
-            },
-          ],
-        },
-        {
-          value: "level_2",
-          label: "二级审批",
-          child_node: [
-            {
-              label: "飞流",
-            },
-            {
-              label: "飞流",
-            },
-          ],
-        },
-        {
-          value: "level_3",
-          label: "三级审批",
-          child_node: [
-            {
-              label: "飞流",
-            },
-            {
-              label: "飞流",
-            },
-            {
-              label: "飞流",
-            },
-          ],
-        },
-      ],
-      options: [
-        {
-          value: "Fly",
-          label: "飞流",
-        },
-        {
-          value: "Fly2",
-          label: "飞流2",
-        },
-        {
-          value: "Fly3",
-          label: "飞流2",
-        },
-      ],
-      value: "Fly",
-      active: 0,
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
+
+<script lang="ts" setup>
+import { reactive, ref } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import type { UploadProps, UploadUserFile } from "element-plus";
+
+import { Edit, Plus, CircleClose, CirclePlus } from "@element-plus/icons-vue";
+//当前选择的审批模板
+const approval_module_value = ref("");
+//审批模板列表选择项
+const approval_module_options = [
+  {
+    value: "Option1",
+    label: "默认模板",
+  },
+  {
+    value: "Option2",
+    label: "二级审批",
+    disabled: true,
+  },
+  {
+    value: "Option3",
+    label: "三级审批",
+  },
+];
+//审批节点中审批类型
+const approver_node_type_radio = ref("1");
+//当前选择的审批人
+const approver_input_selected = ref([]);
+//审批人列表选择项
+const select_approver_options = [
+  {
+    value: "飞流1",
+    label: "飞流1",
+  },
+  {
+    value: "飞流2",
+    label: "飞流2",
+  },
+  {
+    value: "飞流3",
+    label: "飞流3",
+  },
+  {
+    value: "飞流4",
+    label: "飞流4",
+  },
+];
+const current_approval_module_data = ref([
+  {
+    value: "node1",
+    label: "1级审批人",
+    approver_input_selected: [],
+    approver_list: [{}],
+  },
+  // {
+  //   value: "",
+  //   label: "",
+  // },
+]);
+//审批模板数据
+const approval_module_data = [
+  {
+    value: "module1",
+    label: "默认模板",
+
+    approver_node: [
+      {
+        value: "node1",
+        label: "1级审批人",
+        approver_input_selected: [
+          {
+            value: "飞流1",
+            label: "飞流1",
+          },
+        ],
       },
-      fileList: [
-        {
-          name: "food.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-        {
-          name: "food2.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-        {
-          name: "food.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-        {
-          name: "food2.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-        {
-          name: "food.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-        {
-          name: "food2.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100",
-        },
-      ],
-    };
+    ],
   },
 
-  methods: {
-    next() {
-      if (this.active++ > 2) this.active = 0;
-    },
-    onSubmit() {
-      console.log("submit!");
-    },
-    submitUpload() {
-      this.$refs.upload.submit();
-    },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    handleChangeModel(value) {
-      this.current_approval_model = [];
-      console.log("当前模板=" + value);
-      this.approval_model.forEach((item) => {
-        console.log("当前模板子节点=" + item.child_node[0].value);
-        if (item.value == value) {
-          console.log("item.value=" + item.value);
-          this.current_approval_model = item.child_node;
-          console.log(
-            "this.current_approval_model=" +
-              JSON.stringify(this.current_approval_model)
-          );
-        }
-      });
-    },
+  {
+    value: "module2",
+    label: "二级审批",
+    approver_node: [
+      {
+        value: "node1",
+        label: "1级审批人",
+        approver_input_selected: [
+          {
+            value: "飞流3",
+            label: "飞流3",
+          },
+        ],
+      },
+      {
+        value: "node2",
+        label: "2级审批人",
+        approver_input_selected: [
+          {
+            value: "飞流1",
+            label: "飞流1",
+          },
+          {
+            value: "飞流2",
+            label: "飞流2",
+          },
+        ],
+      },
+    ],
   },
+];
+
+//表单字段变量
+const form = reactive({
+  apply_reason: "",
+  process_name: "",
+  apply_user_id: "",
+});
+const active = ref(0);
+// 下一步
+const next = () => {
+  if (active.value++ > 2) active.value = 0;
+};
+// 上一步
+const back = () => {
+  if (active.value-- <= 0) active.value = 0;
+};
+const handleChange = (value) => {
+  console.log("value", value);
+  current_approval_module_data.value = [];
+  approval_module_data.forEach((e) => {
+    if (e.value == value) {
+      console.log(value + "等价value=", e.value);
+      current_approval_module_data.value = e.approver_node;
+      console.log("e.approver_node", e.approver_node);
+    }
+    console.log("current_approval_module_data", current_approval_module_data);
+  });
+};
+
+//在此节点下添加新的审批节点 / 删除当前审批节点
+const HandleAddOrDelApprovalNode = (value, type) => {
+  let current_index = 0;
+  for (
+    let index = 0;
+    index < current_approval_module_data.value.length;
+    index++
+  ) {
+    if (current_approval_module_data.value[index].value == value)
+      current_index = index;
+  }
+  if (type == "add") {
+    const obj = {
+      label: current_index + "级审批人",
+      value: "node" + current_index,
+    };
+    current_approval_module_data.value.splice(current_index + 1, 0, obj);
+  }
+  if (type == "del") {
+    current_approval_module_data.value.splice(current_index, 1);
+  }
+  renderApprovalModuleData();
+};
+
+//重新渲染审批节点顺序
+const renderApprovalModuleData = () => {
+  for (
+    let index = 0;
+    index < current_approval_module_data.value.length;
+    index++
+  ) {
+    current_approval_module_data.value[index].value = index + 1 + "级审批人";
+    current_approval_module_data.value[index].label = index + 1 + "级审批人";
+  }
+};
+
+//创建流程
+const CreateApproveProcess = () => {};
+
+const fileList = ref<UploadUserFile[]>([
+  {
+    name: "element-plus-logo.svg",
+    url: "https://element-plus.org/images/element-plus-logo.svg",
+  },
+  {
+    name: "element-plus-logo2.svg",
+    url: "https://element-plus.org/images/element-plus-logo.svg",
+  },
+]);
+
+const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
+  console.log(file, uploadFiles);
+};
+
+const handlePreview: UploadProps["onPreview"] = (uploadFile) => {
+  console.log(uploadFile);
+};
+
+const handleExceed: UploadProps["onExceed"] = (files, uploadFiles) => {
+  ElMessage.warning(
+    `The limit is 3, you selected ${files.length} files this time, add up to ${
+      files.length + uploadFiles.length
+    } totally`
+  );
+};
+
+const beforeRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
+  return ElMessageBox.confirm(
+    `Cancel the transfer of ${uploadFile.name} ?`
+  ).then(
+    () => true,
+    () => false
+  );
 };
 </script>
 <style>

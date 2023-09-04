@@ -40,6 +40,7 @@ body,
 }
 
 .app-container {
+  font-family: DingTalkJinBuTi;
   padding: 20px;
 }
 </style>

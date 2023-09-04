@@ -1,5 +1,4 @@
 <template>
-  <Breadcrumb />
   <el-tabs
     v-model="editableTabsValue"
     type="card"
@@ -21,7 +20,6 @@
 import { ref, watch } from "vue";
 import store from "@/store";
 import { useRouter } from "vue-router";
-import Breadcrumb from "./components/breadcrumb.vue";
 const router = useRouter();
 
 const editableTabsValue = ref(store.state.editableTabsValue);

@@ -6,6 +6,7 @@ router.beforeEach((to, from, next) => {
     let token = store.getters.GET_TOKEN;
     let hasRoutes = store.state.hasRoutes;
     let menuList = store.getters.GET_MENULIST;
+    console.log("window.sessionStorage.getItem('token')", window.sessionStorage.getItem('token'))
     if (token) {
         if (!hasRoutes) {
             bindRoute(menuList);

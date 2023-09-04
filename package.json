@@ -7,9 +7,12 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@vue/cli-plugin-typescript": "^5.0.8",
+    "ant-design-vue": "^4.0.2",
     "axios": "^1.4.0",
     "core-js": "^3.8.3",
-    "element-plus": "^2.3.9",
+    "element-plus": "^2.3.12",
+    "element-ui": "^2.15.14",
     "js-cookie": "^3.0.5",
     "jsencrypt": "^3.3.2",
     "qs": "^6.11.2",
@@ -25,7 +28,11 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
-    "@vue/cli-service": "~5.0.0"
+    "@vue/cli-service": "~5.0.0",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.2.2",
+    "vue-loader": "^17.2.2",
+    "vue-template-compiler": "^2.7.14"
   },
   "browserslist": [
     "> 1%",

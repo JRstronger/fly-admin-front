@@ -106,13 +106,13 @@
             >分配角色</el-button
           >
           <el-button
-            v-if="scope.row.username != 'java1234'"
+            v-if="scope.row.username != 'fly'"
             type="primary"
             :icon="Edit"
             @click="handleDialogValue(scope.row.id)"
           />
           <el-popconfirm
-            v-if="scope.row.username != 'java1234'"
+            v-if="scope.row.username != 'fly'"
             title="您确定要删除这条记录吗？"
             @confirm="handleDelete(scope.row.id)"
           >
@@ -121,7 +121,7 @@
             </template>
           </el-popconfirm>
           <el-popconfirm
-            v-if="scope.row.username != 'java1234'"
+            v-if="scope.row.username != 'fly'"
             title="您确定要对这个用户重置密码吗？"
             @confirm="handleResetPassword(scope.row.id)"
           >

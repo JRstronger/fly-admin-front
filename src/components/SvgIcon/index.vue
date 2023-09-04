@@ -1,21 +1,26 @@
 <template>
-  <svg class="svg-icon" aria-hidden="true">
-    <use :xlink:href="iconName"></use>
+  <svg :class="svgClass" aria-hidden="true">
+    <use :xlink:href="iconName" />
   </svg>
 </template>
- <script setup>
-import { defineProps, computed } from "vue";
-const props = defineProps({
-  icon: {
-    type: String,
-    required: true,
-  },
-});
+<script lang="ts" setup>
+import { computed, defineProps } from "vue";
+
+const props = defineProps<{
+  iconClass: string;
+  className?: string;
+  [prop: string]: unknown;
+}>();
+
 const iconName = computed(() => {
-  return `#icon-${props.icon}`;
+  return props.iconClass ? `#icon-${props.iconClass}` : "#icon";
+});
+const svgClass = computed(() => {
+  return props.className ? `svg-icon ${props.className}` : "svg-icon";
 });
 </script>
- <style lang="scss" scoped>
+
+<style scoped>
 .svg-icon {
   width: 1em;
   height: 1em;
@@ -24,3 +29,4 @@ const iconName = computed(() => {
   overflow: hidden;
 }
 </style>
+

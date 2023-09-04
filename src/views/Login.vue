@@ -20,7 +20,7 @@
           auto-complete="on"
           placeholder="账号"
         >
-          <template #prefix><svg-icon icon="user" /></template>
+          <template #prefix><svg-icon icon-class="user" /></template>
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
@@ -32,7 +32,7 @@
           placeholder="密码"
           @keyup.enter="handleLogin"
         >
-          <template #prefix><svg-icon icon="password" /></template>
+          <template #prefix><svg-icon icon-class="password" /></template>
         </el-input>
       </el-form-item>
 
@@ -115,11 +115,14 @@ const handleLogin = () => {
           console.log("currentUser=", currentUser);
 
           console.log("menuList=", menuList);
-          store.commit("SET_USERINFO", currentUser);
           store.commit("SET_MENULIST", menuList);
           store.commit("SET_TOKEN", token);
+          store.commit("SET_USERINFO", currentUser);
+
           //跳转到后端首页
           router.replace("/");
+          console.log("跳转到/index");
+          ElMessage.success("登录成功！");
         } else {
           ElMessage.error(data.msg);
         }
@@ -149,6 +152,7 @@ getCookie();
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/font/font_f.css";
 a {
   color: white;
 }
@@ -164,11 +168,13 @@ a {
   margin: 0px auto 30px auto;
   text-align: center;
   color: #707070;
+  font-family: DingTalkJinBuTi;
 }
 .title {
   margin: 0px auto 30px auto;
   text-align: center;
   color: #707070;
+  font-family: DingTalkJinBuTi;
 }
 
 .login-form {
@@ -179,7 +185,7 @@ a {
 
   .el-input {
     height: 40px;
-
+    font-family: DingTalkJinBuTi;
     input {
       display: inline-block;
       height: 40px;
@@ -217,6 +223,7 @@ a {
   font-family: Arial;
   font-size: 50px;
   letter-spacing: 1px;
+  font-family: DingTalkJinBuTi;
 }
 .el-login-footer {
   height: 40px;

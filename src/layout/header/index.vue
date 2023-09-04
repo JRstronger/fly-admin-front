@@ -1,6 +1,7 @@
 <template>
   <div class="navbar">
-    <el-image style="width: 40px; height: 40px" :src="logoUrl"></el-image>
+    <Breadcrumb />
+    <!-- <el-image style="width: 40px; height: 40px" :src="logoUrl"></el-image> -->
     <div class="navbar-right">
       <Avatar />
     </div>
@@ -9,10 +10,11 @@
 
 <script setup>
 import Avatar from "./components/avatar.vue";
+import Breadcrumb from "./components/breadcrumb.vue";
 import { ref } from "vue";
 import { getServerUrl } from "@/util/request";
 console.log("getServerUrl", getServerUrl);
-const logoUrl = ref(getServerUrl() + "image/userAvatar/fly_logo.png");
+// const logoUrl = ref(getServerUrl() + "image/userAvatar/fly_logo.png");
 </script>
 
 <style lang="scss" scoped>
