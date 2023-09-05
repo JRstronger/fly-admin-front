@@ -1,37 +1,33 @@
 <template>
-  <el-button type="primary" style="margin-left: 16px" @click="drawer = true">
-    open
-  </el-button>
-
-  <el-drawer v-model="drawer" title="I'm outer Drawer" size="50%">
-    <div>
-      <el-button @click="innerDrawer = true">Click me!</el-button>
-      <el-drawer
-        v-model="innerDrawer"
-        title="I'm inner Drawer"
-        :append-to-body="true"
-        :before-close="handleClose"
-      >
-        <p>_(:зゝ∠)_</p>
-      </el-drawer>
-    </div>
-  </el-drawer>
+  <el-select
+    v-model="value"
+    clearable
+    placeholder="Select"
+    @click="HandleGetUserListOption"
+  >
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+    />
+  </el-select>
 </template>
 
-<script lang="ts" setup>
+<script  setup>
 import { ref } from "vue";
-import { ElMessageBox } from "element-plus";
+import requestUtil, { getServerUrl } from "@/util/request";
+import { getUserListOption, queryUserById } from "@/api/sys/user";
+const value = ref("");
+const options = ref([
+  {
+    label: "",
+    value: "",
+  },
+]);
 
-const drawer = ref(false);
-const innerDrawer = ref(false);
-
-const handleClose = (done: () => void) => {
-  ElMessageBox.confirm("You still have unsaved data, proceed?")
-    .then(() => {
-      done();
-    })
-    .catch(() => {
-      // catch error
-    });
+const HandleGetUserListOption = async () => {
+  const result = await getUserListOption();
+  options.value = result.data.userListForOptions;
 };
 </script>

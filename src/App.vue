@@ -13,6 +13,12 @@ const route = useRoute();
 const router = useRouter();
 const whitePath = ["/login", "/index", "/"];
 
+mounted = () => {
+  this.$router.afterEach((to) => {
+    document.title = "飞流工作室后台";
+  });
+};
+
 watch(
   route,
   (to, from) => {

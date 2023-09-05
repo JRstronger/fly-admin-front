@@ -22,3 +22,6 @@ export const checkUserName = (username) => requestUtil.post("sys/user/checkUserN
 
 //保存用户信息
 export const saveUserInfo = (params) => requestUtil.post("sys/user/save", params);
+
+//获取用户列表（value、label格式）
+export const getUserListOption = (params) => requestUtil.get("sys/user/listForOptions");

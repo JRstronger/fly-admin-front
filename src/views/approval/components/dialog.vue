@@ -30,6 +30,7 @@
             v-model="approval_module_value"
             placeholder="请选择审批模版..."
             @change="handleChange(approval_module_value)"
+            @click="HandleGetUserListOption"
           >
             <el-option
               v-for="item in approval_module_data"
@@ -75,7 +76,7 @@
               <br />
               <el-form-item label="抄送至">
                 <el-select
-                  v-model="approver_input_selected"
+                  v-model="item2.copy_input_selected"
                   multiple
                   collapse-tags
                   collapse-tags-tooltip
@@ -156,7 +157,8 @@
 import { reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { UploadProps, UploadUserFile } from "element-plus";
-
+import requestUtil, { getServerUrl } from "@/util/request";
+import { getUserListOption, queryUserById } from "@/api/sys/user";
 import { Edit, Plus, CircleClose, CirclePlus } from "@element-plus/icons-vue";
 //当前选择的审批模板
 const approval_module_value = ref("");
@@ -181,7 +183,7 @@ const approver_node_type_radio = ref("1");
 //当前选择的审批人
 const approver_input_selected = ref([]);
 //审批人列表选择项
-const select_approver_options = [
+const select_approver_options = ref([
   {
     value: "飞流1",
     label: "飞流1",
@@ -198,18 +200,15 @@ const select_approver_options = [
     value: "飞流4",
     label: "飞流4",
   },
-];
+]);
 const current_approval_module_data = ref([
   {
     value: "node1",
     label: "1级审批人",
     approver_input_selected: [],
+    copy_input_selected: [],
     approver_list: [{}],
   },
-  // {
-  //   value: "",
-  //   label: "",
-  // },
 ]);
 //审批模板数据
 const approval_module_data = [
@@ -270,6 +269,13 @@ const form = reactive({
   apply_user_id: "",
 });
 const active = ref(0);
+//======调用接口部分==========================================================
+const HandleGetUserListOption = async () => {
+  const result = await getUserListOption();
+  select_approver_options.value = result.data.userListForOptions;
+};
+
+//================================================================
 // 下一步
 const next = () => {
   if (active.value++ > 2) active.value = 0;
@@ -306,6 +312,9 @@ const HandleAddOrDelApprovalNode = (value, type) => {
     const obj = {
       label: current_index + "级审批人",
       value: "node" + current_index,
+      approver_input_selected: [],
+      copy_input_selected: [],
+      approver_list: [{}],
     };
     current_approval_module_data.value.splice(current_index + 1, 0, obj);
   }
