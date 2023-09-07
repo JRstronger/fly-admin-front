@@ -1,5 +1,5 @@
 <template>
-  <el-dialog width="80%">
+  <el-dialog width="80%" @close="handleClose">
     <el-steps :active="active" finish-status="success">
       <el-step title="步骤 1" description="填写申请信息"></el-step>
       <el-step title="步骤 2" description="选择审批人/抄送人"></el-step>
@@ -10,12 +10,16 @@
     <br />
     <el-row :gutter="20">
       <el-col :span="8">
-        <el-form ref="form" :model="form" label-width="80px">
+        <el-form ref="formRef" :model="form" label-width="80px">
           <el-form-item label="流程名称">
-            <el-input v-model="form.process_name"></el-input>
+            <el-input
+              v-model="form.process_name"
+              placeholder="请输入流程名称..."
+              clearable
+            ></el-input>
           </el-form-item>
           <el-form-item label="申请人">
-            <el-input v-model="form.apply_user_id"></el-input>
+            <el-input v-model="form.apply_user_id" disabled></el-input>
           </el-form-item>
           <el-form-item label="申请理由">
             <el-input type="textarea" v-model="form.apply_reason"></el-input>
@@ -34,6 +38,7 @@
           >
             <el-option
               v-for="item in approval_module_data"
+              v-model="item.value"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -42,6 +47,7 @@
         </el-form-item>
         <el-form-item
           v-for="item2 in current_approval_module_data"
+          v-model="item2.value"
           :label="item2.label"
           :key="item2.value"
           :value="item2.value"
@@ -54,12 +60,14 @@
             :max-collapse-tags="3"
             placeholder="请选择审批人..."
             style="width: 240px"
+            @click="HandleGetUserListOption"
           >
             <el-option
               v-for="item in select_approver_options"
+              v-model="item.value"
               :key="item.value"
               :label="item.label"
-              :value="item.value"
+              :value="item.label"
             />
           </el-select>
           <span>&nbsp;</span>
@@ -103,7 +111,7 @@
               placement="top-start"
             >
               <el-icon
-                @click="HandleAddOrDelApprovalNode(item2.value, 'add')"
+                @click="HandleAddOrDelApprovalNode(item2.key_id, 'add')"
                 size="large"
                 ><CirclePlus
               /></el-icon>
@@ -118,7 +126,7 @@
               placement="top-start"
             >
               <el-icon
-                @click="HandleAddOrDelApprovalNode(item2.value, 'del')"
+                @click="HandleAddOrDelApprovalNode(item2.key_id, 'del')"
                 size="large"
                 ><CircleClose
               /></el-icon>
@@ -154,12 +162,20 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { defineEmits, defineProps, reactive, ref } from "vue";
+import store from "@/store";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { UploadProps, UploadUserFile } from "element-plus";
 import requestUtil, { getServerUrl } from "@/util/request";
 import { getUserListOption, queryUserById } from "@/api/sys/user";
+import { AddApproveProcess } from "@/api/approval/approval";
 import { Edit, Plus, CircleClose, CirclePlus } from "@element-plus/icons-vue";
+import { v4 as uuid4 } from "uuid";
+
+const formRef = ref(null);
+
+//当前登录人信息
+const currentUser = ref(store.getters.GET_USERINFO);
 //当前选择的审批模板
 const approval_module_value = ref("");
 //审批模板列表选择项
@@ -185,29 +201,34 @@ const approver_input_selected = ref([]);
 //审批人列表选择项
 const select_approver_options = ref([
   {
-    value: "飞流1",
+    value: 1,
     label: "飞流1",
   },
   {
-    value: "飞流2",
+    value: 1,
     label: "飞流2",
   },
   {
-    value: "飞流3",
+    value: 3,
     label: "飞流3",
   },
   {
-    value: "飞流4",
+    value: 4,
     label: "飞流4",
   },
 ]);
 const current_approval_module_data = ref([
   {
+    key_id: uuid4(),
     value: "node1",
     label: "1级审批人",
+    is_skip: false,
     approver_input_selected: [],
-    copy_input_selected: [],
-    approver_list: [{}],
+    copy_input_selected: [""],
+    created_by: currentUser.value.username,
+    above_step_key_id: "",
+    next_step_key_id: "",
+    order_num: 0,
   },
 ]);
 //审批模板数据
@@ -261,18 +282,44 @@ const approval_module_data = [
     ],
   },
 ];
-
 //表单字段变量
 const form = reactive({
+  process_id: "",
   apply_reason: "",
   process_name: "",
-  apply_user_id: "",
+  apply_user_id: currentUser.value.username,
+  current_approval_module_data: [{}],
 });
 const active = ref(0);
+const emits = defineEmits(["update:modelValue", "initApprovalList"]);
+
+const handleClose = () => {
+  formRef.value.resetFields();
+  emits("update:modelValue", false);
+};
+
 //======调用接口部分==========================================================
 const HandleGetUserListOption = async () => {
   const result = await getUserListOption();
   select_approver_options.value = result.data.userListForOptions;
+  console.log(
+    "approver_input_selected.value===",
+    approver_input_selected.value
+  );
+};
+
+//创建流程
+const CreateApproveProcess = async () => {
+  form.process_id = uuid4();
+  form.apply_user_id = currentUser.value.username;
+  form.current_approval_module_data = current_approval_module_data.value;
+  const result = await AddApproveProcess(form);
+  if (result.data.code === 200) {
+    handleClose();
+    formRef.value.resetFields();
+    emits("initApprovalList");
+    ElMessage.success("流程创建成功！");
+  }
 };
 
 //================================================================
@@ -298,23 +345,28 @@ const handleChange = (value) => {
 };
 
 //在此节点下添加新的审批节点 / 删除当前审批节点
-const HandleAddOrDelApprovalNode = (value, type) => {
+const HandleAddOrDelApprovalNode = (key_id, type) => {
   let current_index = 0;
   for (
     let index = 0;
     index < current_approval_module_data.value.length;
     index++
   ) {
-    if (current_approval_module_data.value[index].value == value)
+    if (current_approval_module_data.value[index].key_id == key_id)
       current_index = index;
   }
   if (type == "add") {
     const obj = {
+      key_id: uuid4(),
       label: current_index + "级审批人",
       value: "node" + current_index,
-      approver_input_selected: [],
+      approver_input_selected: ref([]),
       copy_input_selected: [],
-      approver_list: [{}],
+      is_skip: false,
+      created_by: currentUser.value.username,
+      above_step_key_id: key_id,
+      next_step_key_id: "",
+      order_num: -1,
     };
     current_approval_module_data.value.splice(current_index + 1, 0, obj);
   }
@@ -322,6 +374,10 @@ const HandleAddOrDelApprovalNode = (value, type) => {
     current_approval_module_data.value.splice(current_index, 1);
   }
   renderApprovalModuleData();
+  console.log(
+    "current_approval_module_data.value===",
+    current_approval_module_data.value
+  );
 };
 
 //重新渲染审批节点顺序
@@ -331,13 +387,33 @@ const renderApprovalModuleData = () => {
     index < current_approval_module_data.value.length;
     index++
   ) {
+    current_approval_module_data.value[index].order_num = index + 1;
     current_approval_module_data.value[index].value = index + 1 + "级审批人";
     current_approval_module_data.value[index].label = index + 1 + "级审批人";
+    //第1个节点
+    if (index == 0) {
+      current_approval_module_data.value[index].above_step_key_id =
+        current_approval_module_data.value[index].key_id;
+      current_approval_module_data.value[index].next_step_key_id =
+        current_approval_module_data.value[index + 1].key_id;
+    }
+    //第2个审批节点开始-->倒是第2个节点，保存当前的上一级节点、下一级节点
+    else if (
+      index >= 1 &&
+      index < current_approval_module_data.value.length - 1
+    ) {
+      current_approval_module_data.value[index].above_step_key_id =
+        current_approval_module_data.value[index - 1].key_id;
+      current_approval_module_data.value[index].next_step_key_id =
+        current_approval_module_data.value[index + 1].key_id;
+      //最后一个节点
+    } else if (index == current_approval_module_data.value.length - 1) {
+      current_approval_module_data.value[index].above_step_key_id =
+        current_approval_module_data.value[index - 1].key_id;
+      current_approval_module_data.value[index].next_step_key_id = "";
+    }
   }
 };
-
-//创建流程
-const CreateApproveProcess = () => {};
 
 const fileList = ref<UploadUserFile[]>([
   {

@@ -6,19 +6,32 @@
     @click="HandleGetUserListOption"
   >
     <el-option
+      v-model="form"
       v-for="item in options"
-      :key="item.value"
+      :key="item.tostring"
       :label="item.label"
-      :value="item.value"
+      :value="item.tostring"
     />
   </el-select>
 </template>
 
 <script  setup>
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import requestUtil, { getServerUrl } from "@/util/request";
 import { getUserListOption, queryUserById } from "@/api/sys/user";
-const value = ref("");
+
+const form = reactive([
+  {
+    value: "",
+    label: "",
+  },
+]);
+const value = ref([
+  {
+    value: "",
+    label: "",
+  },
+]);
 const options = ref([
   {
     label: "",
@@ -29,5 +42,6 @@ const options = ref([
 const HandleGetUserListOption = async () => {
   const result = await getUserListOption();
   options.value = result.data.userListForOptions;
+  console.log("value.value==", value.value);
 };
 </script>

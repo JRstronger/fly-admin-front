@@ -8,7 +8,7 @@
           clearable
         ></el-input>
       </el-col>
-      <el-button type="primary" :icon="Search" @click="initUserList"
+      <el-button type="primary" :icon="Search" @click="initApprovalList"
         >搜索</el-button
       >
       <el-button type="success" :icon="DocumentAdd" @click="handleDialogValue()"
@@ -23,44 +23,44 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column
-        prop="process_name"
+        prop="processName"
         label="流程名称"
         width="100"
         align="center"
       />
       <el-table-column
-        prop="process_status"
+        prop="processStatus"
         label="流程状态"
         width="200"
         align="center"
       >
       </el-table-column>
       <el-table-column
-        prop="apply_user_id"
+        prop="applyUserId"
         label="流程发起者"
         width="200"
         align="center"
       />
       <el-table-column
-        prop="current_step_id"
+        prop="currentStepId"
         label="当前步骤节点"
         width="200"
         align="center"
       />
       <el-table-column
-        prop="created_by"
+        prop="createdBy"
         label="创建人"
         width="200"
         align="center"
       />
       <el-table-column
-        prop="created_dt"
+        prop="createdDt"
         label="创建时间"
         width="200"
         align="center"
       />
       <el-table-column
-        prop="created_dt"
+        prop="createdDt"
         label="进度"
         width="150"
         fixed="right"
@@ -68,7 +68,7 @@
       >
         <template v-slot="scope">
           <el-button
-            @click="drawer = true"
+            @click="HandleShowSteps(scope.row.processId)"
             type="primary"
             style="margin-left: 16px"
           >
@@ -91,14 +91,39 @@
     v-model="dialogVisible"
     :dialogVisible="dialogVisible"
     :dialogTitle="dialogTitle"
+    @initApprovalList="initApprovalList"
   />
 
-  <el-drawer v-model="drawer" size="40%">
-    <div>流程进度</div>
+  <el-drawer
+    v-model="drawer"
+    title="流程进度"
+    size="40%"
+    :before-close="handleCloseDrawer"
+  >
+    <div>
+      <el-timeline>
+        <el-timeline-item
+          v-for="item in stepList"
+          :key="item.stepKeyId"
+          :timestamp="item.createdDt"
+        >
+          <el-card>
+            <h2>
+              <el-tag class="ml-2" type="success">{{
+                item.approveUserId
+              }}</el-tag
+              >审批中...
+            </h2>
+            <br />
+            <p>{{ item.stepName }}</p>
+          </el-card>
+        </el-timeline-item>
+      </el-timeline>
+    </div>
   </el-drawer>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref } from "vue";
 import requestUtil, { getServerUrl } from "@/util/request";
 import {
@@ -108,19 +133,18 @@ import {
   Edit,
   Tools,
   RefreshRight,
+  MoreFilled,
 } from "@element-plus/icons-vue";
 import Dialog from "./components/dialog";
 import { ElMessage, ElMessageBox } from "element-plus";
 import RoleDialog from "./components/roleDialog";
 import {
-  getUserList,
-  deleteUserById,
-  resetPassword,
-  updateStatus,
-} from "@/api/sys/user";
+  GetApprovalList,
+  GetStepListByProcessId,
+} from "@/api/approval/approval";
 
 const drawer = ref(false);
-const tableData = ref([]);
+const tableData = ref([{}]);
 
 const total = ref(0);
 
@@ -140,9 +164,25 @@ const delBtnStatus = ref(true);
 
 const multipleSelection = ref([]);
 
-const sysRoleList = ref([]);
-
 const roleDialogVisible = ref(false);
+const stepList = ref([
+  {
+    createdBy: "fly",
+    updatedBy: "fly",
+    createdDt: "2023-09-07T06:51:31.000+00:00",
+    updatedDt: "2023-09-07T06:51:31.000+00:00",
+    remark: null,
+    stepKeyId: 1,
+    stepName: "1级审批人",
+    processId: "",
+    isSkip: false,
+    approveUserId: "[飞流3, 飞流1]",
+    aboveStepKeyId: "",
+    nextStepKeyId: "",
+    operationAction: 0,
+    orderNum: 0,
+  },
+]);
 
 const handleSelectionChange = (selection) => {
   console.log("勾选了");
@@ -151,94 +191,44 @@ const handleSelectionChange = (selection) => {
   delBtnStatus.value = selection.length == 0;
 };
 
-const handleRoleDialogValue = (userId, roleList) => {
-  console.log("userId=" + userId);
-  id.value = userId;
-  sysRoleList.value = roleList;
-  roleDialogVisible.value = true;
+//关闭抽屉
+const handleCloseDrawer = (done: () => void) => {
+  done();
 };
 
-const initUserList = async () => {
-  // const res = await requestUtil.post("sys/user/list", queryForm.value);
-  const res = await getUserList(queryForm.value);
-  tableData.value = res.data.userList;
+//===调用接口部分=========================================================================
+
+const HandleShowSteps = async (process_id) => {
+  console.log("process_id==", process_id);
+  const res = await GetStepListByProcessId(process_id);
+  stepList.value = res.data.stepList;
+  if (res.data.code == 200) {
+    drawer.value = true;
+  }
+};
+
+const initApprovalList = async () => {
+  const res = await GetApprovalList(queryForm.value);
+  tableData.value = res.data.approvalList;
   total.value = res.data.total;
 };
 
-initUserList();
+//============================================================================
+initApprovalList();
 
 const handleSizeChange = (pageSize) => {
   queryForm.value.pageNum = 1;
   queryForm.value.pageSize = pageSize;
-  initUserList();
+  initApprovalList();
 };
 
 const handleCurrentChange = (pageNum) => {
   queryForm.value.pageNum = pageNum;
-  initUserList();
+  initApprovalList();
 };
 
 const handleDialogValue = (userId) => {
   dialogVisible.value = true;
-};
-
-const handleDelete = async (id) => {
-  var ids = [];
-  if (id) {
-    ids.push(id);
-  } else {
-    multipleSelection.value.forEach((row) => {
-      ids.push(row.id);
-    });
-  }
-  // const res = await requestUtil.post("sys/user/delete", ids);
-  const res = await deleteUserById(ids);
-  if (res.data.code == 200) {
-    ElMessage({
-      type: "success",
-      message: "执行成功!",
-    });
-    initUserList();
-  } else {
-    ElMessage({
-      type: "error",
-      message: res.data.msg,
-    });
-  }
-};
-
-const handleResetPassword = async (id) => {
-  // const res = await requestUtil.get("sys/user/resetPassword/" + id);
-  const res = await resetPassword(id);
-  if (res.data.code == 200) {
-    ElMessage({
-      type: "success",
-      message: "执行成功!",
-    });
-    initUserList();
-  } else {
-    ElMessage({
-      type: "error",
-      message: res.data.msg,
-    });
-  }
-};
-
-const statusChangeHandle = async (row) => {
-  //let res = await requestUtil.get("sys/user/updateStatus/" + row.id + "/status/" + row.status);
-  let res = await updateStatus(row.id, row.status);
-  if (res.data.code == 200) {
-    ElMessage({
-      type: "success",
-      message: "执行成功!",
-    });
-  } else {
-    ElMessage({
-      type: "error",
-      message: res.data.msg,
-    });
-    initUserList();
-  }
 };
 </script>
 
