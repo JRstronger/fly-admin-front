@@ -27,12 +27,14 @@
         label="流程名称"
         width="100"
         align="center"
+        v-slot="scope"
       />
       <el-table-column
         prop="processStatus"
         label="流程状态"
         width="200"
         align="center"
+        v-slot="scope"
       >
       </el-table-column>
       <el-table-column
@@ -40,7 +42,12 @@
         label="流程发起者"
         width="200"
         align="center"
-      />
+        v-slot="scope"
+      >
+        <el-tag size="small" type="warning">
+          {{ scope.row.applyUserId }}</el-tag
+        >
+      </el-table-column>
       <el-table-column
         prop="currentStepId"
         label="当前步骤节点"
@@ -109,13 +116,16 @@
         >
           <el-card>
             <h2>
-              <el-tag class="ml-2" type="success">{{
-                item.approveUserId
-              }}</el-tag
-              >审批中...
+              <el-tag
+                class="ml-2"
+                type="primary"
+                v-for="name in item.approveUserId.split(',')"
+                :style="{ 'margin-right': '8px' }"
+                >{{ name }}</el-tag
+              >
             </h2>
             <br />
-            <p>{{ item.stepName }}</p>
+            <p>{{ item.stepName }}审批中...</p>
           </el-card>
         </el-timeline-item>
       </el-timeline>

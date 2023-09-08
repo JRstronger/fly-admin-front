@@ -289,6 +289,7 @@ const form = reactive({
   process_name: "",
   apply_user_id: currentUser.value.username,
   current_approval_module_data: [{}],
+  current_step_id: "",
 });
 const active = ref(0);
 const emits = defineEmits(["update:modelValue", "initApprovalList"]);
@@ -390,12 +391,14 @@ const renderApprovalModuleData = () => {
     current_approval_module_data.value[index].order_num = index + 1;
     current_approval_module_data.value[index].value = index + 1 + "级审批人";
     current_approval_module_data.value[index].label = index + 1 + "级审批人";
-    //第1个节点
+    //第1个节点,默认设置为当前审批节点
     if (index == 0) {
       current_approval_module_data.value[index].above_step_key_id =
         current_approval_module_data.value[index].key_id;
       current_approval_module_data.value[index].next_step_key_id =
         current_approval_module_data.value[index + 1].key_id;
+
+      form.current_step_id = current_approval_module_data.value[index].key_id;
     }
     //第2个审批节点开始-->倒是第2个节点，保存当前的上一级节点、下一级节点
     else if (
