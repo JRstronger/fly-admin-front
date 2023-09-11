@@ -63,7 +63,7 @@
           round
           size="small"
           style="float: right"
-          @click="HandleToApprove(item.processId)"
+          @click="HandleToApprove(item.processId, item.stepKeyId, item.keyId)"
           >去审批</el-button
         >
       </el-timeline-item>
@@ -74,6 +74,8 @@
     v-model="ApproveDrawerVisible"
     :ApproveDrawerVisible="ApproveDrawerVisible"
     :processId="processId"
+    :currentStepKeyId="currentStepKeyId"
+    :noticeKeyId="noticeKeyId"
   />
 </template>
 
@@ -85,6 +87,12 @@ import { Memo } from "@element-plus/icons-vue";
 import { GetApprovalNoticeList } from "@/api/index/index";
 import store from "@/store";
 import ApproveDrawer from "./components/ApproveDrawer";
+import { onMounted, onBeforeMount } from "vue";
+
+//页面挂载之前
+onBeforeMount(() => {
+  HandleGetApprovalNoticeList();
+});
 
 //审批流程抽屉显示
 const ApproveDrawerVisible = ref(false);
@@ -93,7 +101,9 @@ const ApproveDrawerVisible = ref(false);
 const processId = ref("");
 //流程名称
 const processTitle = ref("");
-
+//步骤id
+const currentStepKeyId = ref("");
+const noticeKeyId = ref(-1);
 //审批流程通知列表
 const noticeApprovalList = ref([
   {
@@ -148,8 +158,12 @@ const HandleGetApprovalNoticeList = async () => {
   }
 };
 
-const HandleToApprove = async (process_id) => {
+const HandleToApprove = async (process_id, stepKeyId, nKeyId) => {
   console.log("process_id==", process_id);
+  console.log("stepKeyId==", stepKeyId);
+  console.log("noticeKeyId==", noticeKeyId);
+  noticeKeyId.value = nKeyId;
+  currentStepKeyId.value = stepKeyId;
   ApproveDrawerVisible.value = true;
   processId.value = process_id;
 };

@@ -36,6 +36,10 @@
         align="center"
         v-slot="scope"
       >
+        <template v-if="scope.row.processStatus === 0"> 运行中 </template>
+        <template v-else-if="scope.row.processStatus === 1"> 通过 </template>
+        <template v-else-if="scope.row.processStatus === 2"> 未通过 </template>
+        <template v-else> 结束 </template>
       </el-table-column>
       <el-table-column
         prop="applyUserId"
@@ -115,7 +119,7 @@
           :timestamp="item.createdDt"
         >
           <el-card>
-            <h2>
+            <div class="card_right_info">
               <el-tag
                 class="ml-2"
                 type="primary"
@@ -123,9 +127,19 @@
                 :style="{ 'margin-right': '8px' }"
                 >{{ name }}</el-tag
               >
-            </h2>
-            <br />
-            <p>{{ item.stepName }}审批中...</p>
+              <br /><br />
+              <p>{{ item.stepName }}</p>
+            </div>
+            <img
+              v-bind:src="
+                item.operationAction == 1
+                  ? PASS
+                  : item.operationAction == 3
+                  ? FAIL
+                  : WAIT
+              "
+              class="card_right_status"
+            />
           </el-card>
         </el-timeline-item>
       </el-timeline>
@@ -152,6 +166,9 @@ import {
   GetApprovalList,
   GetStepListByProcessId,
 } from "@/api/approval/approval";
+import FAIL from "@/assets/images/FAIL.png";
+import PASS from "@/assets/images/PASS.png";
+import WAIT from "@/assets/images/WAIT.png";
 
 const drawer = ref(false);
 const tableData = ref([{}]);
@@ -264,5 +281,15 @@ const handleDialogValue = (userId) => {
 
 .el-tag--small {
   margin-left: 5px;
+}
+.card_right_info {
+  width: 70%;
+  height: 80px;
+  float: left;
+}
+.card_right_status {
+  width: 15%;
+  height: 60px;
+  float: right;
 }
 </style>

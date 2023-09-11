@@ -11,3 +11,9 @@ export const AddApproveProcess = (params) => requestUtil.post("approval/create",
 //根据流程process_id获取审批流程步骤节点列表
 
 export const GetStepListByProcessId = (params) => requestUtil.get("approval/steps/" + params);
+
+
+//根据流程currentStepKeyId(1-同意/2-拒绝/3-退回)当前步骤节点
+export const UpdateStepStatusBtn = (stepOpLog) => requestUtil.post("approval/updateStepStatus", stepOpLog);
+
+

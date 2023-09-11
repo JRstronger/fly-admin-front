@@ -311,6 +311,7 @@ const HandleGetUserListOption = async () => {
 
 //创建流程
 const CreateApproveProcess = async () => {
+  renderApprovalModuleData();
   form.process_id = uuid4();
   form.apply_user_id = currentUser.value.username;
   form.current_approval_module_data = current_approval_module_data.value;
@@ -370,9 +371,29 @@ const HandleAddOrDelApprovalNode = (key_id, type) => {
       order_num: -1,
     };
     current_approval_module_data.value.splice(current_index + 1, 0, obj);
+    ElMessage.success("添加成功！");
   }
   if (type == "del") {
-    current_approval_module_data.value.splice(current_index, 1);
+    console.log(
+      "current_approval_module_data.value.length=",
+      current_approval_module_data.value.length
+    );
+    console.log(
+      "current_approval_module_data.value[0].key_id=",
+      current_approval_module_data.value[0].key_id
+    );
+    console.log("key_id=", key_id);
+    //如果当前只剩下一个审批节点，则不允许删除
+    if (
+      current_approval_module_data.value.length == 1 &&
+      current_approval_module_data.value[0].key_id == key_id
+    ) {
+      console.log("必须保留一个审批节点！", key_id);
+      ElMessage.error("必须保留一个审批节点！");
+    } else {
+      current_approval_module_data.value.splice(current_index, 1);
+      ElMessage.success("节点删除成功！");
+    }
   }
   renderApprovalModuleData();
   console.log(
@@ -393,10 +414,16 @@ const renderApprovalModuleData = () => {
     current_approval_module_data.value[index].label = index + 1 + "级审批人";
     //第1个节点,默认设置为当前审批节点
     if (index == 0) {
+      //只剩下一个节点时,下一节点为当前节点
+      if (current_approval_module_data.value.length == 1) {
+        current_approval_module_data.value[index].next_step_key_id =
+          current_approval_module_data.value[index].key_id;
+      } else {
+        current_approval_module_data.value[index].next_step_key_id =
+          current_approval_module_data.value[index + 1].key_id;
+      }
       current_approval_module_data.value[index].above_step_key_id =
         current_approval_module_data.value[index].key_id;
-      current_approval_module_data.value[index].next_step_key_id =
-        current_approval_module_data.value[index + 1].key_id;
 
       form.current_step_id = current_approval_module_data.value[index].key_id;
     }

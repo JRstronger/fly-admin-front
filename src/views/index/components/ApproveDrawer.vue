@@ -1,5 +1,10 @@
 <template>
-  <el-drawer :v-model="ApproveDrawerVisible" :title="processTitle" size="40%">
+  <el-drawer
+    :v-model="ApproveDrawerVisible"
+    :title="processTitle"
+    size="40%"
+    :before-close="handleClose"
+  >
     <div class="process_info">
       <el-descriptions title="申请信息">
         <el-descriptions-item label="流程名称:">{{
@@ -14,30 +19,55 @@
       </el-descriptions>
     </div>
     <div>
-      <el-button type="primary">同意</el-button>
-      <el-button type="warning">拒绝</el-button>
-      <el-button type="danger">退回</el-button>
+      <el-form-item label="审批签字备注">
+        <el-input type="textarea" v-model="stepOpLog.remark"></el-input>
+      </el-form-item>
+      <el-button type="primary" @click="HandleUpdateStepStatusBtn(1)"
+        >同意</el-button
+      >
+      <el-button type="warning" @click="HandleUpdateStepStatusBtn(2)"
+        >拒绝</el-button
+      >
+      <el-button type="danger" @click="HandleUpdateStepStatusBtn(3)"
+        >退回</el-button
+      >
     </div>
   </el-drawer>
 </template>
 
 <script lang="ts" setup>
-import { ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { defineEmits, defineProps, ref, watch } from "vue";
-import { GetStepListByProcessId } from "@/api/approval/approval";
+import {
+  GetStepListByProcessId,
+  UpdateStepStatusBtn,
+} from "@/api/approval/approval";
+import store from "@/store";
+
 const props = defineProps({
   processId: {
     type: String,
     default: "",
     required: true,
   },
+  currentStepKeyId: {
+    type: String,
+    default: "",
+    required: true,
+  },
 
+  noticeKeyId: {
+    type: Number,
+    default: -1,
+    required: true,
+  },
   ApproveDrawerVisible: {
     type: Boolean,
     default: false,
     required: true,
   },
 });
+
 const processTitle = ref("");
 const processInfo = ref({
   createdBy: "common",
@@ -53,14 +83,32 @@ const processInfo = ref({
   processStatus: 0,
   applyReason: "不方便范冰冰的发表",
 });
-
+//当前登录人信息
+const currentUser = ref(store.getters.GET_USERINFO);
+const token = ref(store.getters.GET_TOKEN);
+//步骤操作日志对象
+const stepOpLog = ref({
+  token: token.value,
+  username: currentUser.value.username,
+  stepKeyId: "",
+  processId: "",
+  operateAction: 0,
+  remark: "",
+  createdBy: currentUser.value.username,
+  updatedBy: currentUser.value.username,
+  noticeKeyId: -1,
+});
 watch(
   () => props.ApproveDrawerVisible,
   () => {
-    const processId = props.processId;
-    console.log("watch监控processId=" + processId);
-    if (processId != "1") {
-      HandleGetCurrentProcessInfo(processId);
+    stepOpLog.value.stepKeyId = props.currentStepKeyId;
+    stepOpLog.value.processId = props.processId;
+    stepOpLog.value.noticeKeyId = props.noticeKeyId;
+    console.log("watch监控processId=" + props.processId);
+    console.log("watch监控noticeKeyId=" + props.noticeKeyId);
+    console.log("watch监控currentStepKeyId=" + props.currentStepKeyId);
+    if (props.processId != "1") {
+      HandleGetCurrentProcessInfo(props.processId);
     }
   }
 );
@@ -75,15 +123,24 @@ const HandleGetCurrentProcessInfo = async (processId) => {
   }
 };
 
+const HandleUpdateStepStatusBtn = async (action) => {
+  console.log("stepKeyId==", stepOpLog.value.stepKeyId);
+  console.log("action==", action);
+  console.log("approveSignRemark==", stepOpLog.value.remark);
+  stepOpLog.value.operateAction = action;
+
+  const result = await UpdateStepStatusBtn(stepOpLog.value);
+  if (result.data.code == 200) {
+    ElMessage.success("审批成功！");
+    handleClose();
+  }
+};
+
 //===========================================================================
-const handleClose = (done: () => void) => {
-  ElMessageBox.confirm("确定关闭吗?")
-    .then(() => {
-      done();
-    })
-    .catch(() => {
-      // catch error
-    });
+const emits = defineEmits(["update:modelValue"]);
+
+const handleClose = () => {
+  emits("update:modelValue", false);
 };
 </script>
 <style>
