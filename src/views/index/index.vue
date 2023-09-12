@@ -76,6 +76,7 @@
     :processId="processId"
     :currentStepKeyId="currentStepKeyId"
     :noticeKeyId="noticeKeyId"
+    @HandleGetApprovalNoticeList="HandleGetApprovalNoticeList"
   />
 </template>
 

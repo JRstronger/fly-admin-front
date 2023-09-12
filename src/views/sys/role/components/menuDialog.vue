@@ -90,7 +90,7 @@ const handleConfirm = () => {
     if (valid) {
       var menuIds = treeRef.value.getCheckedKeys();
       let result = await requestUtil.post(
-        "sys/role/grantRole/" + form.value.id,
+        "sys/role/updateMenus/" + form.value.id,
         menuIds
       );
       let data = result.data;

@@ -139,7 +139,7 @@
         >
         <el-button style="margin-top: 50px" @click="next">下一步</el-button>
         <el-button style="margin-top: 50px" @click="CreateApproveProcess"
-          >創建流程</el-button
+          >创建流程</el-button
         >
       </el-col>
       <el-col :span="6">

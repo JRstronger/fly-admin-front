@@ -132,12 +132,13 @@ const HandleUpdateStepStatusBtn = async (action) => {
   const result = await UpdateStepStatusBtn(stepOpLog.value);
   if (result.data.code == 200) {
     ElMessage.success("审批成功！");
+    emits("HandleGetApprovalNoticeList");
     handleClose();
   }
 };
 
 //===========================================================================
-const emits = defineEmits(["update:modelValue"]);
+const emits = defineEmits(["update:modelValue", "HandleGetApprovalNoticeList"]);
 
 const handleClose = () => {
   emits("update:modelValue", false);

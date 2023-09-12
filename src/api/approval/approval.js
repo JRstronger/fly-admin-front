@@ -16,4 +16,7 @@ export const GetStepListByProcessId = (params) => requestUtil.get("approval/step
 //根据流程currentStepKeyId(1-同意/2-拒绝/3-退回)当前步骤节点
 export const UpdateStepStatusBtn = (stepOpLog) => requestUtil.post("approval/updateStepStatus", stepOpLog);
 
+//上传附件
+export const UploadAttachmentFile = (file) => requestUtil.post("approval/uploadFile", file);
+
 

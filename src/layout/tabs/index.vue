@@ -73,7 +73,6 @@ watch(
 </script>
 <style>
 .demo-tabs > .el-tabs__content {
-  padding: 32px;
   color: #ffffff;
   font-size: 32px;
   font-weight: 600;
@@ -82,14 +81,24 @@ watch(
 .el-main {
   padding: 0px;
 }
-
+.el-tabs--card > .el-tabs__header .el-tabs__item {
+  border: 1px solid transparent;
+}
 .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
   background-color: #409eff;
   color: #ffffff;
   font-weight: bold;
+  height: 30px;
+  margin: 5px;
 }
-
-.el-tabs {
-  height: 45px;
+.el-tabs--card > .el-tabs__header .el-tabs__item.is-closable {
+  padding-left: 13px;
+  padding-right: 13px;
+  border: 1px solid #e8e8e8;
+  height: 30px;
+  margin: 5px;
+}
+.el-tabs--card > .el-tabs__header .el-tabs__nav {
+  border: 1px solid transparent;
 }
 </style>

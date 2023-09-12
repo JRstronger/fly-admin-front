@@ -116,7 +116,7 @@
         <el-timeline-item
           v-for="item in stepList"
           :key="item.stepKeyId"
-          :timestamp="item.createdDt"
+          :timestamp="item.updatedDt"
         >
           <el-card>
             <div class="card_right_info">
