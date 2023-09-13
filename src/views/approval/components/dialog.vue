@@ -145,18 +145,23 @@
       <el-col :span="6">
         <el-upload
           v-model:file-list="fileList"
-          class="upload-demo"
-          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+          :action="UploadFileApiUrl"
           multiple
           :on-preview="handlePreview"
           :on-remove="handleRemove"
           :before-remove="beforeRemove"
-          :limit="3"
-          :on-exceed="handleExceed"
+          :limit="10"
+          :on-success="handleAttachmentSuccess"
         >
-          <el-button type="primary">点击上传附件</el-button>
-          <template #tip> </template> </el-upload
-      ></el-col>
+          <el-button type="primary"
+            ><el-icon><UploadFilled /></el-icon>上传附件</el-button
+          >
+
+          <template #tip>
+            <div class="el-upload__tip">注意:上传文件不大于10MB</div>
+          </template>
+        </el-upload></el-col
+      >
     </el-row>
   </el-dialog>
 </template>
@@ -169,7 +174,13 @@ import type { UploadProps, UploadUserFile } from "element-plus";
 import requestUtil, { getServerUrl } from "@/util/request";
 import { getUserListOption, queryUserById } from "@/api/sys/user";
 import { AddApproveProcess } from "@/api/approval/approval";
-import { Edit, Plus, CircleClose, CirclePlus } from "@element-plus/icons-vue";
+import {
+  Edit,
+  Plus,
+  CircleClose,
+  CirclePlus,
+  UploadFilled,
+} from "@element-plus/icons-vue";
 import { v4 as uuid4 } from "uuid";
 
 const formRef = ref(null);
@@ -290,6 +301,7 @@ const form = reactive({
   apply_user_id: currentUser.value.username,
   current_approval_module_data: [{}],
   current_step_id: "",
+  attachment_list: [],
 });
 const active = ref(0);
 const emits = defineEmits(["update:modelValue", "initApprovalList"]);
@@ -297,6 +309,7 @@ const emits = defineEmits(["update:modelValue", "initApprovalList"]);
 const handleClose = () => {
   formRef.value.resetFields();
   emits("update:modelValue", false);
+  resetFields();
 };
 
 //======调用接口部分==========================================================
@@ -315,16 +328,29 @@ const CreateApproveProcess = async () => {
   form.process_id = uuid4();
   form.apply_user_id = currentUser.value.username;
   form.current_approval_module_data = current_approval_module_data.value;
+  form.attachment_list = attachmentList.value;
   const result = await AddApproveProcess(form);
   if (result.data.code === 200) {
     handleClose();
     formRef.value.resetFields();
+    resetFields();
     emits("initApprovalList");
     ElMessage.success("流程创建成功！");
   }
 };
 
 //================================================================
+
+//重置表单
+const resetFields = () => {
+  form.process_id = "";
+  form.apply_reason = "";
+  form.process_name = "";
+  form.apply_user_id = currentUser.value.username;
+  form.current_approval_module_data = [{}];
+  form.current_step_id = "";
+  form.attachment_list = [];
+};
 // 下一步
 const next = () => {
   if (active.value++ > 2) active.value = 0;
@@ -445,41 +471,49 @@ const renderApprovalModuleData = () => {
   }
 };
 
-const fileList = ref<UploadUserFile[]>([
-  {
-    name: "element-plus-logo.svg",
-    url: "https://element-plus.org/images/element-plus-logo.svg",
-  },
-  {
-    name: "element-plus-logo2.svg",
-    url: "https://element-plus.org/images/element-plus-logo.svg",
-  },
-]);
+//====上次附件============================================================
 
+const UploadFileApiUrl = ref(getServerUrl() + "approval/uploadFile");
+
+const fileList = ref([]);
+
+const attachmentList = ref([]);
+
+const handleAttachmentSuccess = (res) => {
+  // const newFile = res.data.name;
+  const newFile = {
+    name: res.data.name,
+    url: res.data.url,
+    source_file_name: res.data.source_file_name,
+  };
+  attachmentList.value.push(newFile);
+  console.log("attachmentList.value===", attachmentList.value);
+};
+
+//根据文件名删除文件
 const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
-  console.log(file, uploadFiles);
+  const fileName = file.response.data.name;
+  console.log("fileName==", fileName);
+
+  attachmentList.value = attachmentList.value.filter(
+    (f) => fileName !== f.name
+  );
+
+  console.log("handleRemove=attachmentList.value==", attachmentList.value);
 };
 
 const handlePreview: UploadProps["onPreview"] = (uploadFile) => {
   console.log(uploadFile);
-};
-
-const handleExceed: UploadProps["onExceed"] = (files, uploadFiles) => {
-  ElMessage.warning(
-    `The limit is 3, you selected ${files.length} files this time, add up to ${
-      files.length + uploadFiles.length
-    } totally`
-  );
+  window.open(uploadFile.url);
 };
 
 const beforeRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
-  return ElMessageBox.confirm(
-    `Cancel the transfer of ${uploadFile.name} ?`
-  ).then(
+  return ElMessageBox.confirm(`确定要删除【 ${uploadFile.name} 】附件吗?`).then(
     () => true,
     () => false
   );
 };
+//================================================================
 </script>
 <style>
 .el-row {

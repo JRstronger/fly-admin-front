@@ -25,7 +25,7 @@
       <el-table-column
         prop="processName"
         label="流程名称"
-        width="100"
+        width="200"
         align="center"
         v-slot="scope"
       />
@@ -73,7 +73,7 @@
       <el-table-column
         prop="createdDt"
         label="进度"
-        width="150"
+        width="200"
         fixed="right"
         align="center"
       >
@@ -112,6 +112,27 @@
     :before-close="handleCloseDrawer"
   >
     <div>
+      <el-descriptions title="申请信息">
+        <el-descriptions-item label="流程名称:">{{
+          processInfo.processName
+        }}</el-descriptions-item>
+        <el-descriptions-item label="申请人:">{{
+          processInfo.applyUserId
+        }}</el-descriptions-item>
+        <el-descriptions-item label="申请理由:">{{
+          processInfo.applyReason
+        }}</el-descriptions-item>
+      </el-descriptions>
+      <br />
+      <el-descriptions title="附件信息" />
+      <el-upload
+        v-model:file-list="attachmentFile"
+        :on-preview="handlePreview"
+        disabled
+      >
+      </el-upload>
+      <br />
+      <el-descriptions title="流程进度" />
       <el-timeline>
         <el-timeline-item
           v-for="item in stepList"
@@ -192,6 +213,8 @@ const delBtnStatus = ref(true);
 const multipleSelection = ref([]);
 
 const roleDialogVisible = ref(false);
+
+const processInfo = ref({});
 const stepList = ref([
   {
     createdBy: "fly",
@@ -211,6 +234,7 @@ const stepList = ref([
   },
 ]);
 
+const attachmentFile = ref([{}]);
 const handleSelectionChange = (selection) => {
   console.log("勾选了");
   console.log(selection);
@@ -229,6 +253,8 @@ const HandleShowSteps = async (process_id) => {
   console.log("process_id==", process_id);
   const res = await GetStepListByProcessId(process_id);
   stepList.value = res.data.stepList;
+  processInfo.value = res.data.processInfo;
+  attachmentFile.value = res.data.attachmentFile;
   if (res.data.code == 200) {
     drawer.value = true;
   }
@@ -256,6 +282,12 @@ const handleCurrentChange = (pageNum) => {
 
 const handleDialogValue = (userId) => {
   dialogVisible.value = true;
+};
+
+//附件预览/下载
+const handlePreview: UploadProps["onPreview"] = (uploadFile) => {
+  console.log(uploadFile);
+  window.open(uploadFile.url);
 };
 </script>
 
@@ -291,5 +323,8 @@ const handleDialogValue = (userId) => {
   width: 15%;
   height: 60px;
   float: right;
+}
+.el-upload-list__item {
+  line-height: 30px;
 }
 </style>

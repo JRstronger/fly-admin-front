@@ -56,6 +56,7 @@ imageUrl.value = getServerUrl() + "image/userAvatar/" + form.value.avatar;
 const handleAvatarSuccess = (res) => {
   imageUrl.value = getServerUrl() + res.data.src;
   form.value.avatar = res.data.title;
+  console.log("imageUrl.value==", imageUrl.value);
 };
 
 const beforeAvatarUpload = (file) => {

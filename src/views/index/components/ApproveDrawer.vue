@@ -17,10 +17,22 @@
           processInfo.applyReason
         }}</el-descriptions-item>
       </el-descriptions>
+      <br />
+      <el-descriptions title="附件信息" />
+      <el-upload
+        v-model:file-list="attachmentFile"
+        :on-preview="handlePreview"
+        disabled
+      >
+      </el-upload>
     </div>
     <div>
       <el-form-item label="审批签字备注">
-        <el-input type="textarea" v-model="stepOpLog.remark"></el-input>
+        <el-input
+          type="textarea"
+          v-model="stepOpLog.remark"
+          class="stepOpLogRemark"
+        ></el-input>
       </el-form-item>
       <el-button type="primary" @click="HandleUpdateStepStatusBtn(1)"
         >同意</el-button
@@ -67,7 +79,7 @@ const props = defineProps({
     required: true,
   },
 });
-
+const attachmentFile = ref([]);
 const processTitle = ref("");
 const processInfo = ref({
   createdBy: "common",
@@ -113,6 +125,12 @@ watch(
   }
 );
 
+//附件预览/下载
+const handlePreview: UploadProps["onPreview"] = (uploadFile) => {
+  console.log(uploadFile);
+  window.open(uploadFile.url);
+};
+
 //=====接口调用部分===========================================================
 
 const HandleGetCurrentProcessInfo = async (processId) => {
@@ -120,6 +138,7 @@ const HandleGetCurrentProcessInfo = async (processId) => {
   if (result.data.code == 200) {
     processTitle.value = result.data.processInfo.processName;
     processInfo.value = result.data.processInfo;
+    attachmentFile.value = result.data.attachmentFile;
   }
 };
 
@@ -147,5 +166,11 @@ const handleClose = () => {
 <style>
 .process_info {
   height: 600px;
+}
+.el-upload-list__item {
+  line-height: 30px;
+}
+.stepOpLogRemark {
+  height: 50px;
 }
 </style>

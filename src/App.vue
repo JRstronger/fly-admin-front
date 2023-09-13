@@ -43,6 +43,7 @@ html,
 body,
 #app {
   height: 100%;
+  font-family: DingTalkJinBuTi;
 }
 
 .app-container {
