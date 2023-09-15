@@ -139,7 +139,7 @@
           :key="item.stepKeyId"
           :timestamp="item.updatedDt"
         >
-          <el-card>
+          <el-card class="step_node_card">
             <div class="card_right_info">
               <el-tag
                 class="ml-2"
@@ -326,5 +326,9 @@ const handlePreview: UploadProps["onPreview"] = (uploadFile) => {
 }
 .el-upload-list__item {
   line-height: 30px;
+}
+.step_node_card {
+  box-shadow: -5px 7px 48px -3px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 </style>

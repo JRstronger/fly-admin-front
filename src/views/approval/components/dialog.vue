@@ -75,7 +75,7 @@
             <template #reference>
               <el-button type="primary" :icon="Edit" circle size="small" />
             </template>
-            <div>
+            <div class="step_node_info">
               <el-radio-group v-model="approver_node_type_radio">
                 <el-radio label="1" border>会签（所有人都同意即可）</el-radio>
                 <br />
@@ -91,6 +91,7 @@
                   :max-collapse-tags="3"
                   placeholder="请选择抄送给..."
                   style="width: 240px"
+                  @click="HandleGetUserListOption"
                 >
                   <el-option
                     v-for="item in select_approver_options"
@@ -110,11 +111,13 @@
               content="在此下方添加审批节点"
               placement="top-start"
             >
-              <el-icon
+              <el-button
+                type="primary"
+                :icon="Plus"
+                circle
                 @click="HandleAddOrDelApprovalNode(item2.key_id, 'add')"
-                size="large"
-                ><CirclePlus
-              /></el-icon>
+                size="small"
+              />
             </el-tooltip>
           </el-form-item>
           <span>&nbsp;&nbsp;</span>
@@ -125,11 +128,13 @@
               content="删除当前审批节点"
               placement="top-start"
             >
-              <el-icon
+              <el-button
+                type="danger"
+                :icon="Delete"
+                circle
                 @click="HandleAddOrDelApprovalNode(item2.key_id, 'del')"
-                size="large"
-                ><CircleClose
-              /></el-icon>
+                size="small"
+              />
             </el-tooltip>
           </el-form-item>
         </el-form-item>
@@ -180,6 +185,7 @@ import {
   CircleClose,
   CirclePlus,
   UploadFilled,
+  Delete,
 } from "@element-plus/icons-vue";
 import { v4 as uuid4 } from "uuid";
 
@@ -216,7 +222,7 @@ const select_approver_options = ref([
     label: "飞流1",
   },
   {
-    value: 1,
+    value: 2,
     label: "飞流2",
   },
   {
@@ -541,5 +547,8 @@ const beforeRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
 .row-bg {
   padding: 10px 0;
   background-color: #f9fafc;
+}
+.step_node_info {
+  height: 300px;
 }
 </style>

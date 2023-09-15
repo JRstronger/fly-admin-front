@@ -1,7 +1,7 @@
 import requestUtil from "@/util/request";
 
 
-// 创建审批流程
+// 获取审批流程列表
 export const GetApprovalList = (params) => requestUtil.post("approval/list", params);
 
 
@@ -19,4 +19,14 @@ export const UpdateStepStatusBtn = (stepOpLog) => requestUtil.post("approval/upd
 //上传附件
 export const UploadAttachmentFile = (file) => requestUtil.post("approval/updateFile", file);
 
+
+// 获取审批模板列表
+export const GetTemplateList = (params) => requestUtil.post("approval/TemplateList", params);
+
+// 创建审批模板
+export const SaveApprovalTemplate = (params) => requestUtil.post("approval/SaveApprovalTemplate", params);
+
+
+//通过模板key_id获取模板信息
+export const GetTemplateInfoByKeyId = (params) => requestUtil.get("approval/templateInfo/" + params);
 

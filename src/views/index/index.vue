@@ -14,7 +14,7 @@
     />
   </el-select>
 
-  <el-row :gutter="10">
+  <el-row :gutter="10" style="margin-right: 0px">
     <el-col :span="4">
       <el-card shadow="always" @click="HandleGetApprovalNoticeList">
         <h1 class="top_num_list">12</h1>
@@ -177,7 +177,6 @@ const HandleToApprove = async (process_id, stepKeyId, nKeyId) => {
   color: blue;
   margin-bottom: 5px;
 }
-
 .card-header {
   display: flex;
   justify-content: space-between;
