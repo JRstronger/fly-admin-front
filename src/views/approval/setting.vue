@@ -19,23 +19,18 @@
       >
     </el-row>
 
-    <el-table
-      :data="tableData"
-      stripe
-      style="width: 100%"
-      @selection-change="handleSelectionChange"
-    >
+    <el-table :data="tableData" stripe style="width: 100%">
       <el-table-column
         prop="templateName"
         label="审批模板名称"
-        width="200"
+        width="400"
         align="center"
         v-slot="scope"
       />
       <el-table-column
         prop="templateDesc"
         label="模板描述"
-        width="200"
+        width="400"
         align="center"
         v-slot="scope"
       />
@@ -49,13 +44,13 @@
       <el-table-column
         prop="createdDt"
         label="创建时间"
-        width="200"
+        width="400"
         align="center"
       />
       <el-table-column
         prop="createdDt"
         label="操作"
-        width="200"
+        width="300"
         fixed="right"
         align="center"
       >

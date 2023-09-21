@@ -11,19 +11,28 @@ const routes = [
       {
         path: '/index',
         name: '首页',
-        component: () => import('../views/index/index.vue')
+        component: () => import('../views/index/index.vue'),
+        meta: {
+          title: '首页'
+        }
       },
       {
         path: '/userCenter',
         name: '个人中心',
-        component: () => import('../views/userCenter/index.vue')
+        component: () => import('../views/userCenter/index.vue'),
+        meta: {
+          title: '个人中心'
+        }
       },
     ]
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('../views/Login.vue')
+    component: () => import('../views/Login.vue'),
+    meta: {
+      title: '飞流工作室-后台登录'
+    }
   }
 ]
 

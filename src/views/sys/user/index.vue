@@ -25,124 +25,155 @@
         </template>
       </el-popconfirm>
     </el-row>
-
-    <el-table
-      :data="tableData"
-      stripe
-      style="width: 100%"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="avatar" label="头像" width="80" align="center">
-        <template v-slot="scope">
-          <img
-            :src="getServerUrl() + 'image/userAvatar/' + scope.row.avatar"
-            width="30"
-            height="30"
-          />
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="username"
-        label="用户名"
-        width="100"
-        align="center"
-      />
-      <el-table-column prop="roles" label="拥有角色" width="200" align="center">
-        <template v-slot="scope">
-          <el-tag
-            size="small"
-            type="warning"
-            v-for="item in scope.row.sysRoleList"
-          >
-            {{ item.name }}</el-tag
-          >
-        </template>
-      </el-table-column>
-      <el-table-column prop="email" label="邮箱" width="200" align="center" />
-      <el-table-column
-        prop="phonenumber"
-        label="手机号"
-        width="120"
-        align="center"
-      />
-      <el-table-column prop="status" label="状态？" width="200" align="center">
-        <template v-slot="{ row }">
-          <el-switch
-            v-model="row.status"
-            @change="statusChangeHandle(row)"
-            active-text="正常"
-            inactive-text="禁用"
-            active-value="0"
-            inactive-value="1"
-          ></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="createTime"
-        label="创建时间"
-        width="200"
-        align="center"
-      />
-      <el-table-column
-        prop="loginDate"
-        label="最后登录时间"
-        width="200"
-        align="center"
-      />
-      <el-table-column prop="remark" label="备注" />
-      <el-table-column
-        prop="action"
-        label="操作"
-        width="400"
-        fixed="right"
-        align="center"
-      >
-        <template v-slot="scope">
-          <el-button
-            type="primary"
-            :icon="Tools"
-            @click="handleRoleDialogValue(scope.row.id, scope.row.sysRoleList)"
-            >分配角色</el-button
-          >
-          <el-button
-            v-if="scope.row.username != 'fly'"
-            type="primary"
-            :icon="Edit"
-            @click="handleDialogValue(scope.row.id)"
-          />
-          <el-popconfirm
-            v-if="scope.row.username != 'fly'"
-            title="您确定要删除这条记录吗？"
-            @confirm="handleDelete(scope.row.id)"
-          >
-            <template #reference>
-              <el-button type="danger" :icon="Delete" />
+    <el-row :gutter="20">
+      <el-col :span="4" class="deptTreeCol">
+        <el-tree
+          ref="treeRef"
+          class="filter-tree"
+          :data="treeData"
+          :props="defaultProps"
+          node-key="id"
+          default-expand-all
+          @node-click="HandleCurrentNode"
+        />
+      </el-col>
+      <el-col :span="20">
+        <el-table
+          :data="tableData"
+          stripe
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" width="55" />
+          <el-table-column prop="avatar" label="头像" width="80" align="center">
+            <template v-slot="scope">
+              <img
+                :src="getServerUrl() + 'image/userAvatar/' + scope.row.avatar"
+                width="30"
+                height="30"
+              />
             </template>
-          </el-popconfirm>
-          <el-popconfirm
-            v-if="scope.row.username != 'fly'"
-            title="您确定要对这个用户重置密码吗？"
-            @confirm="handleResetPassword(scope.row.id)"
+          </el-table-column>
+          <el-table-column
+            prop="username"
+            label="用户名"
+            width="100"
+            align="center"
+          />
+          <el-table-column
+            prop="roles"
+            label="拥有角色"
+            width="200"
+            align="center"
           >
-            <template #reference>
-              <el-button type="warning" :icon="RefreshRight"
-                >重置密码</el-button
+            <template v-slot="scope">
+              <el-tag
+                size="small"
+                type="warning"
+                v-for="item in scope.row.sysRoleList"
+              >
+                {{ item.name }}</el-tag
               >
             </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination
-      v-model:currentPage="queryForm.pageNum"
-      v-model:page-size="queryForm.pageSize"
-      :page-sizes="[10, 20, 30, 40]"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+          </el-table-column>
+          <el-table-column
+            prop="email"
+            label="邮箱"
+            width="200"
+            align="center"
+          />
+          <el-table-column
+            prop="phonenumber"
+            label="手机号"
+            width="120"
+            align="center"
+          />
+          <el-table-column
+            prop="status"
+            label="状态？"
+            width="200"
+            align="center"
+          >
+            <template v-slot="{ row }">
+              <el-switch
+                v-model="row.status"
+                @change="statusChangeHandle(row)"
+                active-text="正常"
+                inactive-text="禁用"
+                active-value="0"
+                inactive-value="1"
+              ></el-switch>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="createTime"
+            label="创建时间"
+            width="200"
+            align="center"
+          />
+          <el-table-column
+            prop="loginDate"
+            label="最后登录时间"
+            width="200"
+            align="center"
+          />
+          <el-table-column prop="remark" label="备注" />
+          <el-table-column
+            prop="action"
+            label="操作"
+            width="400"
+            fixed="right"
+            align="center"
+          >
+            <template v-slot="scope">
+              <el-button
+                type="primary"
+                :icon="Tools"
+                @click="
+                  handleRoleDialogValue(scope.row.id, scope.row.sysRoleList)
+                "
+                >分配角色</el-button
+              >
+              <el-button
+                v-if="scope.row.username != 'fly'"
+                type="primary"
+                :icon="Edit"
+                @click="handleDialogValue(scope.row.id)"
+              />
+              <el-popconfirm
+                v-if="scope.row.username != 'fly'"
+                title="您确定要删除这条记录吗？"
+                @confirm="handleDelete(scope.row.id)"
+              >
+                <template #reference>
+                  <el-button type="danger" :icon="Delete" />
+                </template>
+              </el-popconfirm>
+              <el-popconfirm
+                v-if="scope.row.username != 'fly'"
+                title="您确定要对这个用户重置密码吗？"
+                @confirm="handleResetPassword(scope.row.id)"
+              >
+                <template #reference>
+                  <el-button type="warning" :icon="RefreshRight"
+                    >重置密码</el-button
+                  >
+                </template>
+              </el-popconfirm>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          v-model:currentPage="queryForm.pageNum"
+          v-model:page-size="queryForm.pageSize"
+          :page-sizes="[10, 20, 30, 40]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </el-col>
+    </el-row>
   </div>
   <Dialog
     v-model="dialogVisible"
@@ -172,7 +203,7 @@ import {
   RefreshRight,
 } from "@element-plus/icons-vue";
 import Dialog from "./components/dialog";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage, ElTree } from "element-plus";
 import RoleDialog from "./components/roleDialog";
 import {
   getUserList,
@@ -181,6 +212,7 @@ import {
   updateStatus,
 } from "@/api/sys/user";
 
+import { getDeptTreeList } from "@/api/sys/dept";
 const tableData = ref([]);
 
 const total = ref(0);
@@ -204,6 +236,18 @@ const multipleSelection = ref([]);
 const sysRoleList = ref([]);
 
 const roleDialogVisible = ref(false);
+
+//======组织树组件======================================================================
+
+const defaultProps = {
+  children: "children",
+  label: "deptName",
+  id: "deptId",
+};
+
+const treeData = ref([]);
+
+//======组件方法======================================================================
 
 const handleSelectionChange = (selection) => {
   console.log("勾选了");
@@ -249,6 +293,21 @@ const handleDialogValue = (userId) => {
   }
   dialogVisible.value = true;
 };
+
+//====前端方法部分========================================================================
+
+const HandleCurrentNode = async (data) => {
+  console.log("当前节点ID：", data.deptId + data.deptName);
+};
+
+//====后端接口调用部分========================================================================
+
+const initDeptList = async () => {
+  const res = await getDeptTreeList();
+  treeData.value = res.data.treeDept;
+};
+
+initDeptList();
 
 const handleDelete = async (id) => {
   var ids = [];
@@ -332,5 +391,10 @@ const statusChangeHandle = async (row) => {
 
 .el-tag--small {
   margin-left: 5px;
+}
+.deptTreeCol {
+  border: 1px solid #eedede;
+  border-radius: 5px;
+  height: 550px;
 }
 </style>

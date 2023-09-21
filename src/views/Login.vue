@@ -105,6 +105,7 @@ const handleLogin = () => {
         let result = await requestUtil.post(
           "login?" + qs.stringify(loginForm.value)
         );
+        console.log("login?" + qs.stringify(loginForm.value));
         let data = result.data;
         console.log("login-data", data);
         if (data.code == 200) {
@@ -120,8 +121,9 @@ const handleLogin = () => {
           store.commit("SET_USERINFO", currentUser);
 
           //跳转到后端首页
-          router.replace("/");
+          // router.replace("/");
           console.log("跳转到/index");
+          window.location.href = "/index";
           ElMessage.success("登录成功！");
         } else {
           ElMessage.error(data.msg);

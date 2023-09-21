@@ -1,43 +1,65 @@
 <template>
   <router-view />
-  <!-- <el-button type="primary" @click="handleLogin">测试登录</el-button>
-  <el-button type="danger" @click="handleUserList">测试获取用户数据</el-button> -->
 </template>
 
 <script setup>
-import requestUtil from "@/util/request";
 import store from "./store";
-import { ref, watch } from "vue";
+import { ref, watch, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
 const route = useRoute();
 const router = useRouter();
 const whitePath = ["/login", "/index", "/"];
 
-const mounted = () => {
-  this.$router.afterEach((to) => {
-    document.title = "飞流工作室后台";
+onMounted(() => {
+  const router = useRouter();
+  const route = useRoute();
+
+  const updatePageTitle = () => {
+    const pageTitle = route.meta.title || "飞流工作室后台";
+    document.title = pageTitle;
+  };
+
+  router.afterEach(() => {
+    updatePageTitle();
   });
-};
+
+  // 初始化时设置页面标题
+  updatePageTitle();
+});
+
+onUnmounted(() => {
+  const router = useRouter();
+  router.afterEach(() => {}); // 移除afterEach钩子函数
+});
+
+const pageTitle = computed(() => {
+  return document.title || "飞流工作室后台";
+});
+watch(pageTitle, (newTitle) => {
+  document.title = newTitle;
+});
 
 watch(
-  route,
+  () => route.path,
   (to, from) => {
-    console.log("to" + to.name);
-    console.log(to.path);
+    console.log("to: ", to);
+    console.log("from: ", from);
 
-    if (whitePath.indexOf(to.path) === -1) {
-      console.log("to.path=" + to.path);
+    if (whitePath.indexOf(to) === -1) {
+      console.log("to.path=" + to);
       let obj = {
-        name: to.name,
-        path: to.path,
+        name: route.name,
+        path: route.path,
       };
 
       store.commit("ADD_TABS", obj);
     }
   },
-  { deep: true, immediate: true }
+  { immediate: true }
 );
 </script>
+
 <style>
 html,
 body,

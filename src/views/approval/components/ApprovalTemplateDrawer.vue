@@ -6,14 +6,14 @@
     :before-close="handleClose"
   >
     <el-descriptions title="基本信息" />
-    <el-form ref="formRef" :model="form" label-width="80px">
-      <el-form-item label="模板名称">
+    <el-form ref="infoFormRef" :model="form" :rules="rules" label-width="80px">
+      <el-form-item label="模板名称" prop="templateName">
         <el-input
           v-model="form.templateName"
           placeholder="请输入模板名称..."
         ></el-input>
       </el-form-item>
-      <el-form-item label="模板描述">
+      <el-form-item label="模板描述" prop="templateDesc">
         <el-input
           v-model="form.templateDesc"
           placeholder="请输入模板描述..."
@@ -154,7 +154,7 @@
 </template>
 
 
-<script setup>
+<script lang="ts" setup>
 import {
   defineEmits,
   defineProps,
@@ -164,7 +164,7 @@ import {
   watch,
 } from "vue";
 import store from "@/store";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 import requestUtil, { getServerUrl } from "@/util/request";
 import { getUserListOption, queryUserById } from "@/api/sys/user";
 import {
@@ -215,8 +215,8 @@ watch(
   () => {
     templateKeyId.value = props.templateKeyId;
     templateAction.value = props.templateAction;
-    console.log("watch监控templateKeyId=" + templateKeyId.value);
-    console.log("watch监控templateAction=" + templateAction.value);
+    console.log("watch监听templateKeyId=" + templateKeyId.value);
+    console.log("watch监听templateAction=" + templateAction.value);
     if (props.templateAction != "create") {
       console.log("templateAction.value", templateAction.value);
       HandleGetTemplateInfoByKeyId(templateKeyId.value);
@@ -226,7 +226,6 @@ watch(
   }
 );
 
-const selectedInput = ref([]);
 //审批流程模版抽屉显示
 const ApprovalModuleDrawerVisible = ref(false);
 
@@ -254,6 +253,19 @@ const CurrentApprovalModuleData = ref([
     nodeSignType: 1,
   },
 ]);
+
+//=========form表单部分=======================================================
+
+// const form = reactive({
+//   keyId: "",
+//   templateName: "",
+//   templateDesc: "",
+//   applyUserId: currentUser.value.username,
+//   CurrentApprovalModuleData: [],
+//   copyUserId: [],
+// });
+
+const infoFormRef = ref(null);
 const form = reactive({
   keyId: "",
   templateName: "",
@@ -262,6 +274,18 @@ const form = reactive({
   CurrentApprovalModuleData: [],
   copyUserId: [],
 });
+
+const rules = ref({
+  templateName: [{ required: true, message: "请输入名称", trigger: "blur" }],
+});
+
+const resetForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  formEl.resetFields();
+};
+
+//=============================================================================
+
 //======调用接口部分==========================================================
 //获取用户列表options
 const HandleGetUserListOption = async () => {

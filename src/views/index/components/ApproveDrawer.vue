@@ -116,9 +116,9 @@ watch(
     stepOpLog.value.stepKeyId = props.currentStepKeyId;
     stepOpLog.value.processId = props.processId;
     stepOpLog.value.noticeKeyId = props.noticeKeyId;
-    console.log("watch监控processId=" + props.processId);
-    console.log("watch监控noticeKeyId=" + props.noticeKeyId);
-    console.log("watch监控currentStepKeyId=" + props.currentStepKeyId);
+    console.log("watch监听processId=" + props.processId);
+    console.log("watch监听noticeKeyId=" + props.noticeKeyId);
+    console.log("watch监听currentStepKeyId=" + props.currentStepKeyId);
     if (props.processId != "1") {
       HandleGetCurrentProcessInfo(props.processId);
     }

@@ -45,8 +45,25 @@
 
       <el-form-item label="组件路径" prop="component">
         <el-input v-model="form.component" />
+        <el-alert
+          title="例如: sys/user/index"
+          :closable="false"
+          style="line-height: 8px"
+          type="success"
+        >
+        </el-alert>
       </el-form-item>
-
+      <el-form-item label="路由路径" prop="path">
+        <el-input v-model="form.path" />
+        <el-alert
+          v-if="form.id == -1"
+          title="例如: /sys/user"
+          :closable="false"
+          style="line-height: 8px"
+          type="success"
+        >
+        </el-alert>
+      </el-form-item>
       <el-form-item label="显示顺序" prop="orderNum">
         <el-input-number
           v-model="form.orderNum"
@@ -103,6 +120,7 @@ const form = ref({
   perms: "",
   component: "",
   orderNum: 1,
+  path: "",
 });
 
 const rules = ref({
@@ -134,6 +152,7 @@ watch(
         perms: "",
         component: "",
         orderNum: 1,
+        path: "",
       };
     }
   }

@@ -61,10 +61,10 @@ const openTab = (item) => {
   store.commit("ADD_TABS", item);
 };
 
-const isCollapse = ref(false);
-const isC = () => {
-  isCollapse = !isCollapse;
-};
+// const isCollapse = ref(false);
+// const isC = () => {
+//   isCollapse = !isCollapse;
+// };
 const activeIndex = ref("/index");
 
 watch(
