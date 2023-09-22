@@ -37,9 +37,10 @@
           :props="parentDeptIdPops"
           filterable
           v-model="form.deptId"
-          @change="HandleChangeParentDeptId"
+          @change="HandleChangeParentDeptId, initDeptTreeList"
           @click="initDeptTreeList"
           placeholder="请选择所属部门..."
+          style="width: 100%"
         />
       </el-form-item>
       <el-form-item label="选择所属岗位">
@@ -48,6 +49,7 @@
           @change="HandleChangePositionId"
           placeholder="请选择所属岗位..."
           @click="HandleGetPositionListOption"
+          style="width: 100%"
         >
           <el-option
             v-for="item in positionListOptions"
@@ -59,7 +61,6 @@
           />
         </el-select>
       </el-form-item>
-      <el-button @click="HandleChangePositionId">取消</el-button>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="form.remark" type="textarea" :rows="4" />
       </el-form-item>
@@ -171,8 +172,8 @@ watch(
     console.log("id=" + id);
     if (id != -1) {
       initFormData(id);
-    } else {
       initDeptTreeList();
+    } else {
       form.value = {
         id: -1,
         username: "",

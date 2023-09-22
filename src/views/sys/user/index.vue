@@ -6,6 +6,7 @@
           placeholder="请输入用户名..."
           v-model="queryForm.query"
           clearable
+          @change="initUserList"
         ></el-input>
       </el-col>
       <el-button type="primary" :icon="Search" @click="initUserList"
@@ -254,6 +255,7 @@ const queryForm = ref({
   query: "",
   pageNum: 1,
   pageSize: 10,
+  id: 0,
 });
 
 const dialogVisible = ref(false);
@@ -331,6 +333,8 @@ const handleDialogValue = (userId) => {
 
 const HandleCurrentNode = async (data) => {
   console.log("当前节点ID：", data.deptId + data.deptName);
+  queryForm.value.id = data.deptId;
+  console.log("queryForm.value=", queryForm.value);
   const res = await getUserList(queryForm.value);
   tableData.value = res.data.userList;
   total.value = res.data.total;
