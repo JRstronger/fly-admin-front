@@ -14,6 +14,7 @@
           v-model="form.parentDeptId"
           @change="HandleChangeParentDeptId"
           @click="getDeptTreeList"
+          placeholder="请选择上级部门..."
         />
       </el-form-item>
 
@@ -76,7 +77,7 @@
 <script setup>
 import { defineEmits, defineProps, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
-import { addById, selectDeptById, getDeptTreeList } from "@/api/sys/dept";
+import { addDeptById, selectDeptById, getDeptTreeList } from "@/api/sys/dept";
 import { getUserListOption } from "@/api/sys/user";
 import store from "@/store";
 //======常量定义======================================================================
@@ -213,7 +214,7 @@ const initFormData = async (id) => {
 const handleConfirm = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
-      let result = await addById(form.value);
+      let result = await addDeptById(form.value);
       let data = result.data;
       if (data.code == 200) {
         ElMessage.success("执行成功！");

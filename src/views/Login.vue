@@ -123,7 +123,7 @@ const handleLogin = () => {
           //跳转到后端首页
           // router.replace("/");
           console.log("跳转到/index");
-          window.location.href = "/index";
+          window.location.href = "/";
           ElMessage.success("登录成功！");
         } else {
           ElMessage.error(data.msg);

@@ -31,6 +31,35 @@
         </el-radio-group>
       </el-form-item>
 
+      <el-form-item label="所属部门" prop="deptId">
+        <el-cascader
+          :options="deptListOptions"
+          :props="parentDeptIdPops"
+          filterable
+          v-model="form.deptId"
+          @change="HandleChangeParentDeptId"
+          @click="initDeptTreeList"
+          placeholder="请选择所属部门..."
+        />
+      </el-form-item>
+      <el-form-item label="选择所属岗位">
+        <el-select
+          v-model="form.positionId"
+          @change="HandleChangePositionId"
+          placeholder="请选择所属岗位..."
+          @click="HandleGetPositionListOption"
+        >
+          <el-option
+            v-for="item in positionListOptions"
+            :props="positionIdPops"
+            v-model="item.positionId"
+            :key="item.positionId"
+            :label="item.positionName"
+            :value="item.positionId"
+          />
+        </el-select>
+      </el-form-item>
+      <el-button @click="HandleChangePositionId">取消</el-button>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="form.remark" type="textarea" :rows="4" />
       </el-form-item>
@@ -49,6 +78,11 @@ import { defineEmits, defineProps, ref, watch } from "vue";
 import requestUtil, { getServerUrl } from "@/util/request";
 import { ElMessage } from "element-plus";
 import { queryUserById, checkUserName, saveUserInfo } from "@/api/sys/user";
+import { getDeptTreeList, getPositionListNoPage } from "@/api/sys/dept";
+import store from "@/store";
+
+//当前登录人信息
+const currentUser = ref(store.getters.GET_USERINFO);
 
 const props = defineProps({
   id: {
@@ -74,8 +108,11 @@ const form = ref({
   password: "123456",
   status: "0",
   phonenumber: "",
+  deptId: "",
+  positionId: "",
   email: "",
   remark: "",
+  updatedBy: currentUser.value.username,
 });
 
 const checkUsername = async (rule, value, callback) => {
@@ -95,6 +132,8 @@ const checkUsername = async (rule, value, callback) => {
 };
 
 const rules = ref({
+  deptId: [{ required: true, message: "请输入选择所属部门" }],
+  positionId: [{ required: true, message: "请输入选择所属岗位" }],
   username: [
     { required: true, message: "请输入用户名" },
     { required: true, validator: checkUsername, trigger: "blur" },
@@ -133,23 +172,69 @@ watch(
     if (id != -1) {
       initFormData(id);
     } else {
+      initDeptTreeList();
       form.value = {
         id: -1,
         username: "",
         password: "123456",
         status: "0",
         phonenumber: "",
+        deptId: "",
+        positionId: "",
         email: "",
         remark: "",
+        updatedBy: currentUser.value.username,
       };
     }
   }
 );
 
+//======部门、岗位组件方法======================================================================
+
+//部门级联选择器
+const parentDeptIdPops = {
+  checkStrictly: true,
+  value: "deptId",
+  label: "deptName",
+};
+//岗位选择器
+const positionIdPops = {
+  checkStrictly: true,
+  value: "positionId",
+  label: "positionName",
+};
+
+const deptListOptions = ref([]);
+const positionListOptions = ref([]);
+
+const HandleChangeParentDeptId = (value) => {
+  let selectedDept = 0;
+  if (value && value.length > 0) {
+    selectedDept = value[value.length - 1]; // 获取最后一个选中的项
+    console.log("当前选中的项value：", selectedDept);
+  }
+  form.value.deptId = selectedDept;
+  console.log("当前选中的项对应form.parentDeptId：", form.value.parentDeptId);
+};
+
+const HandleChangePositionId = () => {
+  console.log("当前选中的项对应 form.value.positionId", form.value.positionId);
+};
 const emits = defineEmits(["update:modelValue", "initUserList"]);
 
 const handleClose = () => {
   emits("update:modelValue", false);
+};
+//======接口调用======================================================================
+
+const initDeptTreeList = async () => {
+  const res = await getDeptTreeList();
+  deptListOptions.value = res.data.treeDept;
+};
+
+const HandleGetPositionListOption = async () => {
+  const result = await getPositionListNoPage();
+  positionListOptions.value = result.data.positionList;
 };
 
 const handleConfirm = () => {

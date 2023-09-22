@@ -61,6 +61,39 @@
             align="center"
           />
           <el-table-column
+            prop="sysUserDeptPositionRelation"
+            label="部门"
+            width="100"
+            align="center"
+          >
+            <template v-slot="scope">
+              <el-tag
+                size="small"
+                type="primary"
+                v-for="item in scope.row.sysUserDeptPositionRelation"
+              >
+                {{ item.sysDept.deptName }}</el-tag
+              >
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="sysUserDeptPositionRelation"
+            label="职位"
+            width="150"
+            align="center"
+          >
+            <template v-slot="scope">
+              <el-tag
+                size="small"
+                type="primary"
+                v-for="item1 in scope.row.sysUserDeptPositionRelation"
+              >
+                {{ item1.sysPosition.positionName }}</el-tag
+              >
+            </template>
+          </el-table-column>
+
+          <el-table-column
             prop="roles"
             label="拥有角色"
             width="200"
@@ -70,9 +103,9 @@
               <el-tag
                 size="small"
                 type="warning"
-                v-for="item in scope.row.sysRoleList"
+                v-for="item2 in scope.row.sysRoleList"
               >
-                {{ item.name }}</el-tag
+                {{ item2.name }}</el-tag
               >
             </template>
           </el-table-column>
@@ -90,7 +123,7 @@
           />
           <el-table-column
             prop="status"
-            label="状态？"
+            label="状态"
             width="200"
             align="center"
           >
@@ -265,7 +298,7 @@ const handleRoleDialogValue = (userId, roleList) => {
 
 const initUserList = async () => {
   // const res = await requestUtil.post("sys/user/list", queryForm.value);
-  const res = await getUserList(queryForm.value);
+  const res = await getUserList(queryForm.value, 0);
   tableData.value = res.data.userList;
   total.value = res.data.total;
 };
@@ -298,6 +331,9 @@ const handleDialogValue = (userId) => {
 
 const HandleCurrentNode = async (data) => {
   console.log("当前节点ID：", data.deptId + data.deptName);
+  const res = await getUserList(queryForm.value);
+  tableData.value = res.data.userList;
+  total.value = res.data.total;
 };
 
 //====后端接口调用部分========================================================================
