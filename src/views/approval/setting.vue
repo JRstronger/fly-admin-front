@@ -6,9 +6,10 @@
           placeholder="请输入模板名称..."
           v-model="queryForm.query"
           clearable
+          @change="initGetTemplateList"
         ></el-input>
       </el-col>
-      <el-button type="primary" :icon="Search" @click="initApprovalList"
+      <el-button type="primary" :icon="Search" @click="initGetTemplateList"
         >搜索</el-button
       >
       <el-button
@@ -69,6 +70,13 @@
           >
             编辑
           </el-button>
+          <el-button
+            @click="HandleDeleteTemplateById(scope.row.keyId)"
+            type="primary"
+            style="margin-left: 16px"
+          >
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -95,7 +103,10 @@ import store from "@/store";
 import { ElMessage, ElMessageBox } from "element-plus";
 import requestUtil, { getServerUrl } from "@/util/request";
 import { getUserListOption, queryUserById } from "@/api/sys/user";
-import { GetTemplateList } from "@/api/approval/approval";
+import {
+  GetTemplateList,
+  DeleteTemplateByKeyId,
+} from "@/api/approval/approval";
 import {
   Edit,
   Plus,
@@ -103,6 +114,7 @@ import {
   CirclePlus,
   UploadFilled,
   Delete,
+  Search,
 } from "@element-plus/icons-vue";
 import { v4 as uuid4 } from "uuid";
 import ApprovalTemplateDrawer from "./components/ApprovalTemplateDrawer";
@@ -178,6 +190,14 @@ const form = reactive({
 const initGetTemplateList = async () => {
   const res = await GetTemplateList(queryForm.value);
   tableData.value = res.data.templateList;
+};
+
+const HandleDeleteTemplateById = async (id) => {
+  const res = await DeleteTemplateByKeyId(id);
+  if (res.data.code == 200) {
+    initGetTemplateList();
+    ElMessage.success("删除成功！");
+  }
 };
 
 //================================================================

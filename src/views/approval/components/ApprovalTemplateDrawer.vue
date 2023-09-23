@@ -48,7 +48,7 @@
     <el-timeline>
       <!-- 编辑 -->
       <el-timeline-item
-        v-for="item2 in CurrentApprovalModuleData"
+        v-for="item2 in currentApprovalModuleData"
         v-model="item2.stepName"
         :label="item2.stepName"
         :key="item2.stepName"
@@ -237,7 +237,7 @@ const approver_node_type_radio = ref("1");
 
 //审批人列表选择项
 const select_approver_options = ref([]);
-const CurrentApprovalModuleData = ref([
+const currentApprovalModuleData = ref([
   {
     keyId: uuid4(),
     stepName: "1级审批人",
@@ -261,7 +261,7 @@ const CurrentApprovalModuleData = ref([
 //   templateName: "",
 //   templateDesc: "",
 //   applyUserId: currentUser.value.username,
-//   CurrentApprovalModuleData: [],
+//   currentApprovalModuleData: [],
 //   copyUserId: [],
 // });
 
@@ -271,7 +271,7 @@ const form = reactive({
   templateName: "",
   templateDesc: "",
   applyUserId: currentUser.value.username,
-  CurrentApprovalModuleData: [],
+  currentApprovalModuleData: [],
   copyUserId: [],
 });
 
@@ -297,7 +297,7 @@ const HandleGetUserListOption = async () => {
 const HandleSaveApprovalTemplate = async () => {
   renderApprovalModuleData();
   form.keyId = uuid4();
-  form.CurrentApprovalModuleData = CurrentApprovalModuleData.value;
+  form.currentApprovalModuleData = currentApprovalModuleData.value;
   console.log("form.value==", form);
   const result = await SaveApprovalTemplate(form);
   if (result.data.code == 200) {
@@ -313,19 +313,19 @@ const HandleGetTemplateInfoByKeyId = async (tKeyId) => {
   form.keyId = result.data.templateInfo.keyId;
   form.templateName = result.data.templateInfo.templateName;
   form.templateDesc = result.data.templateInfo.templateDesc;
-  CurrentApprovalModuleData.value = result.data.templateList;
+  currentApprovalModuleData.value = result.data.templateList;
   // form.copyUserId = result.data.templateInfo.copyUserId;
   // form.copyUserId = form.copyUserId.split(",");
 
   //由于后端存储的是字符串，故在这要转为数组，便于组件解析
-  CurrentApprovalModuleData.value.forEach((element) => {
+  currentApprovalModuleData.value.forEach((element) => {
     element.approveUserId = element.approveUserId.split(",");
   });
 
   console.log("form.value ==", form);
   console.log(
-    "CurrentApprovalModuleData.value==",
-    CurrentApprovalModuleData.value
+    "currentApprovalModuleData.value==",
+    currentApprovalModuleData.value
   );
 };
 
@@ -346,14 +346,14 @@ const back = () => {
 };
 const handleChange = (value) => {
   console.log("value", value);
-  CurrentApprovalModuleData.value = [];
+  currentApprovalModuleData.value = [];
   approval_module_data.forEach((e) => {
     if (e.value == value) {
       console.log(value + "等价value=", e.value);
-      CurrentApprovalModuleData.value = e.approver_node;
+      currentApprovalModuleData.value = e.approver_node;
       console.log("e.approver_node", e.approver_node);
     }
-    console.log("CurrentApprovalModuleData", CurrentApprovalModuleData);
+    console.log("currentApprovalModuleData", currentApprovalModuleData);
   });
 };
 
@@ -361,8 +361,8 @@ const handleChange = (value) => {
 const HandleAddOrDelApprovalNode = (keyId, type) => {
   console.log("keyId==", keyId);
   let current_index = 0;
-  for (let index = 0; index < CurrentApprovalModuleData.value.length; index++) {
-    if (CurrentApprovalModuleData.value[index].keyId == keyId)
+  for (let index = 0; index < currentApprovalModuleData.value.length; index++) {
+    if (currentApprovalModuleData.value[index].keyId == keyId)
       current_index = index;
   }
   if (type == "add") {
@@ -378,69 +378,69 @@ const HandleAddOrDelApprovalNode = (keyId, type) => {
       nextStepKeyId: "",
       orderNum: -1,
     };
-    CurrentApprovalModuleData.value.splice(current_index + 1, 0, obj);
+    currentApprovalModuleData.value.splice(current_index + 1, 0, obj);
     ElMessage.success("添加成功！");
   }
   if (type == "del") {
     console.log(
-      "CurrentApprovalModuleData.value.length=",
-      CurrentApprovalModuleData.value.length
+      "currentApprovalModuleData.value.length=",
+      currentApprovalModuleData.value.length
     );
     console.log(
-      "CurrentApprovalModuleData.value[0].keyId=",
-      CurrentApprovalModuleData.value[0].keyId
+      "currentApprovalModuleData.value[0].keyId=",
+      currentApprovalModuleData.value[0].keyId
     );
     console.log("keyId=", keyId);
     //如果当前只剩下一个审批节点，则不允许删除
     if (
-      CurrentApprovalModuleData.value.length == 1 &&
-      CurrentApprovalModuleData.value[0].keyId == keyId
+      currentApprovalModuleData.value.length == 1 &&
+      currentApprovalModuleData.value[0].keyId == keyId
     ) {
       console.log("必须保留一个审批节点！", keyId);
       ElMessage.error("必须保留一个审批节点！");
     } else {
-      CurrentApprovalModuleData.value.splice(current_index, 1);
+      currentApprovalModuleData.value.splice(current_index, 1);
       ElMessage.success("节点删除成功！");
     }
   }
   renderApprovalModuleData();
   console.log(
-    "CurrentApprovalModuleData.value===",
-    CurrentApprovalModuleData.value
+    "currentApprovalModuleData.value===",
+    currentApprovalModuleData.value
   );
 };
 
 //重新渲染审批节点顺序
 const renderApprovalModuleData = () => {
-  for (let index = 0; index < CurrentApprovalModuleData.value.length; index++) {
-    CurrentApprovalModuleData.value[index].orderNum = index + 1;
-    CurrentApprovalModuleData.value[index].stepName = index + 1 + "级审批人";
-    CurrentApprovalModuleData.value[index].value = index + 1 + "级审批人";
-    CurrentApprovalModuleData.value[index].label = index + 1 + "级审批人";
+  for (let index = 0; index < currentApprovalModuleData.value.length; index++) {
+    currentApprovalModuleData.value[index].orderNum = index + 1;
+    currentApprovalModuleData.value[index].stepName = index + 1 + "级审批人";
+    currentApprovalModuleData.value[index].value = index + 1 + "级审批人";
+    currentApprovalModuleData.value[index].label = index + 1 + "级审批人";
     //第1个节点,默认设置为当前审批节点
     if (index == 0) {
       //只剩下一个节点时,下一节点为当前节点
-      if (CurrentApprovalModuleData.value.length == 1) {
-        CurrentApprovalModuleData.value[index].nextStepKeyId =
-          CurrentApprovalModuleData.value[index].keyId;
+      if (currentApprovalModuleData.value.length == 1) {
+        currentApprovalModuleData.value[index].nextStepKeyId =
+          currentApprovalModuleData.value[index].keyId;
       } else {
-        CurrentApprovalModuleData.value[index].nextStepKeyId =
-          CurrentApprovalModuleData.value[index + 1].keyId;
+        currentApprovalModuleData.value[index].nextStepKeyId =
+          currentApprovalModuleData.value[index + 1].keyId;
       }
-      CurrentApprovalModuleData.value[index].aboveStepKeyId =
-        CurrentApprovalModuleData.value[index].keyId;
+      currentApprovalModuleData.value[index].aboveStepKeyId =
+        currentApprovalModuleData.value[index].keyId;
     }
     //第2个审批节点开始-->倒是第2个节点，保存当前的上一级节点、下一级节点
-    else if (index >= 1 && index < CurrentApprovalModuleData.value.length - 1) {
-      CurrentApprovalModuleData.value[index].aboveStepKeyId =
-        CurrentApprovalModuleData.value[index - 1].keyId;
-      CurrentApprovalModuleData.value[index].nextStepKeyId =
-        CurrentApprovalModuleData.value[index + 1].keyId;
+    else if (index >= 1 && index < currentApprovalModuleData.value.length - 1) {
+      currentApprovalModuleData.value[index].aboveStepKeyId =
+        currentApprovalModuleData.value[index - 1].keyId;
+      currentApprovalModuleData.value[index].nextStepKeyId =
+        currentApprovalModuleData.value[index + 1].keyId;
       //最后一个节点
-    } else if (index == CurrentApprovalModuleData.value.length - 1) {
-      CurrentApprovalModuleData.value[index].aboveStepKeyId =
-        CurrentApprovalModuleData.value[index - 1].keyId;
-      CurrentApprovalModuleData.value[index].nextStepKeyId = "";
+    } else if (index == currentApprovalModuleData.value.length - 1) {
+      currentApprovalModuleData.value[index].aboveStepKeyId =
+        currentApprovalModuleData.value[index - 1].keyId;
+      currentApprovalModuleData.value[index].nextStepKeyId = "";
     }
   }
 };
@@ -457,11 +457,11 @@ const resetFormData = () => {
   form.templateName = "";
   form.templateDesc = "";
   form.applyUserId = currentUser.value.username;
-  form.CurrentApprovalModuleData = [];
+  form.currentApprovalModuleData = [];
   form.copyUserId = [];
 
   console.log("form重置后=", form);
-  CurrentApprovalModuleData.value = [
+  currentApprovalModuleData.value = [
     {
       keyId: uuid4(),
       stepName: "1级审批人",
@@ -479,8 +479,8 @@ const resetFormData = () => {
   ];
 
   console.log(
-    "CurrentApprovalModuleData.value重置后=",
-    CurrentApprovalModuleData.value
+    "currentApprovalModuleData.value重置后=",
+    currentApprovalModuleData.value
   );
 };
 </script>

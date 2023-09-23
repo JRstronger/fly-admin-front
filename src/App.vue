@@ -58,6 +58,30 @@ watch(
   },
   { immediate: true }
 );
+
+///=====================================================================================
+// 解决:在vue3中使用element-plus页面重置报ResizeObserver loop completed with undelivered notifications.
+const debounce = (fn, delay) => {
+  let timer = null;
+  return function () {
+    let context = this;
+    let args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      fn.apply(context, args);
+    }, delay);
+  };
+};
+
+const _ResizeObserver = window.ResizeObserver;
+window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
+  constructor(callback) {
+    callback = debounce(callback, 16);
+    super(callback);
+  }
+};
+
+///=====================================================================================
 </script>
 
 <style>
@@ -71,5 +95,8 @@ body,
 .app-container {
   font-family: DingTalkJinBuTi;
   padding: 20px;
+}
+.el-button {
+  font-family: DingTalkJinBuTi;
 }
 </style>

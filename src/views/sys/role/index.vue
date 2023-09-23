@@ -33,7 +33,7 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="name" label="角色名" width="100" align="center" />
+      <el-table-column prop="name" label="角色名" width="200" align="center" />
       <el-table-column
         prop="code"
         label="权限字符"

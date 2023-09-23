@@ -84,7 +84,6 @@
   </div>
   <Dialog
     v-model="dialogVisible"
-    :tableData="tableData"
     :dialogVisible="dialogVisible"
     :id="id"
     :dialogTitle="dialogTitle"

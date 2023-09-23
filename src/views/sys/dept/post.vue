@@ -28,7 +28,7 @@
       <el-table-column
         prop="positionName"
         label="职位名称"
-        width="100"
+        width="200"
         align="center"
       />
       <el-table-column

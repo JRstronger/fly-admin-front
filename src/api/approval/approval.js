@@ -30,3 +30,5 @@ export const SaveApprovalTemplate = (params) => requestUtil.post("approval/SaveA
 //通过模板key_id获取模板信息
 export const GetTemplateInfoByKeyId = (params) => requestUtil.get("approval/templateInfo/" + params);
 
+//通过模板key_id删除模板信息
+export const DeleteTemplateByKeyId = (id) => requestUtil.get("approval/template/delete/" + id);

@@ -70,7 +70,7 @@
             <template v-slot="scope">
               <el-tag
                 size="small"
-                type="primary"
+                type="danger"
                 v-for="item in scope.row.sysUserDeptPositionRelation"
               >
                 {{ item.sysDept.deptName }}</el-tag
