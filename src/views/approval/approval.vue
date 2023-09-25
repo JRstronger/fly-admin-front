@@ -73,7 +73,7 @@
       <el-table-column
         prop="createdDt"
         label="进度"
-        width="200"
+        width="300"
         fixed="right"
         align="center"
       >

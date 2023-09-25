@@ -70,13 +70,16 @@
           >
             编辑
           </el-button>
-          <el-button
-            @click="HandleDeleteTemplateById(scope.row.keyId)"
-            type="primary"
-            style="margin-left: 16px"
+          <el-popconfirm
+            title="您确定要删除这个模版吗？"
+            @confirm="HandleDeleteTemplateById(scope.row.keyId)"
           >
-            删除
-          </el-button>
+            <template #reference>
+              <el-button type="primary" style="margin-left: 16px">
+                删除
+              </el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>

@@ -19,6 +19,10 @@
       <el-icon><home-filled /></el-icon>
       <span>首页</span>
     </el-menu-item>
+    <el-menu-item index="/dashboard">
+      <el-icon><DataAnalysis /></el-icon>
+      <span>仪表盘</span>
+    </el-menu-item>
 
     <el-sub-menu :index="menu.path" v-for="menu in menuList">
       <template #title>
@@ -49,6 +53,7 @@ import {
   Edit,
   SwitchButton,
   Promotion,
+  DataAnalysis,
 } from "@element-plus/icons-vue";
 import { ref, watch } from "vue";
 import store from "@/store";

@@ -33,6 +33,14 @@ const routes = [
     meta: {
       title: '飞流工作室-后台登录'
     }
+  },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('../views/index/dashboard.vue'),
+    meta: {
+      title: '飞流工作室-仪表盘'
+    }
   }
 ]
 

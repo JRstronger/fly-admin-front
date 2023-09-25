@@ -155,6 +155,10 @@ getCookie();
 
 <style lang="scss" scoped>
 @import "@/assets/font/font_f.css";
+body,
+html {
+  font-family: DingTalkJinBuTi;
+}
 a {
   color: white;
 }
@@ -165,6 +169,7 @@ a {
   height: 100%;
   background-image: url("../assets/images/login-background.jpg");
   background-size: cover;
+  font-family: DingTalkJinBuTi;
 }
 .studio-title {
   margin: 0px auto 30px auto;
@@ -184,6 +189,7 @@ a {
   background: #ffffff;
   width: 400px;
   padding: 25px 25px 5px 25px;
+  font-family: DingTalkJinBuTi;
 
   .el-input {
     height: 40px;
