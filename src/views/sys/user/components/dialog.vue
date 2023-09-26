@@ -172,7 +172,6 @@ watch(
     console.log("id=" + id);
     if (id != -1) {
       initFormData(id);
-      initDeptTreeList();
     } else {
       form.value = {
         id: -1,
@@ -187,6 +186,7 @@ watch(
         updatedBy: currentUser.value.username,
       };
     }
+    initDeptTreeList();
   }
 );
 

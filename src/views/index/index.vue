@@ -56,9 +56,8 @@
         v-for="item in noticeApprovalList"
         :key="item.keyId"
         :timestamp="item.sendDt"
-        class="approval_item"
       >
-        {{ item.title }}
+        <span class="approval_item">{{ item.title }}</span>
         <el-button
           round
           size="small"
@@ -93,6 +92,7 @@ import { onMounted, onBeforeMount } from "vue";
 //页面挂载之前
 onBeforeMount(() => {
   HandleGetApprovalNoticeList();
+  loadCurrentUserPerms();
 });
 
 //审批流程抽屉显示
@@ -124,6 +124,15 @@ const noticeApprovalList = ref([
 
 //当前登录人信息
 const currentUser = ref(store.getters.GET_USERINFO);
+
+//当前用户的菜单权限信息(简要关键信息)
+const currentUserPermsShort = ref([]);
+
+const loadCurrentUserPerms = () => {
+  console.log("loadCurrentUserPerms");
+  currentUserPermsShort.value = store.getters.GET_AUTHLISTSHORT;
+};
+
 const form = reactive([
   {
     value: "",
@@ -201,6 +210,5 @@ const HandleToApprove = async (process_id, stepKeyId, nKeyId) => {
 }
 .approval_item:hover {
   color: rgb(19, 71, 212);
-  font-weight: bold;
 }
 </style>

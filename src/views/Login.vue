@@ -113,9 +113,9 @@ const handleLogin = () => {
           const token = data.authorization;
           const menuList = data.menuList;
           const currentUser = data.currentUser;
-          console.log("currentUser=", currentUser);
+          const authListShort = data.authListShort;
 
-          console.log("menuList=", menuList);
+          store.commit("SET_AUTHLISTSHORT", authListShort);
           store.commit("SET_MENULIST", menuList);
           store.commit("SET_TOKEN", token);
           store.commit("SET_USERINFO", currentUser);

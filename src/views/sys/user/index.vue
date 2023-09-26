@@ -12,7 +12,11 @@
       <el-button type="primary" :icon="Search" @click="initUserList"
         >搜索</el-button
       >
-      <el-button type="success" :icon="DocumentAdd" @click="handleDialogValue()"
+      <el-button
+        type="success"
+        :icon="DocumentAdd"
+        @click="handleDialogValue()"
+        v-if="currentUserPermsShort.includes('system:user:add')"
         >新增</el-button
       >
       <el-popconfirm
@@ -20,7 +24,11 @@
         @confirm="handleDelete(null)"
       >
         <template #reference>
-          <el-button type="danger" :disabled="delBtnStatus" :icon="Delete"
+          <el-button
+            type="danger"
+            :disabled="delBtnStatus"
+            :icon="Delete"
+            v-if="currentUserPermsShort.includes('system:user:delete')"
             >批量删除</el-button
           >
         </template>
@@ -163,6 +171,7 @@
               <el-button
                 type="primary"
                 :icon="Tools"
+                v-if="currentUserPermsShort.includes('system:user:role')"
                 @click="
                   handleRoleDialogValue(scope.row.id, scope.row.sysRoleList)
                 "
@@ -175,7 +184,7 @@
                 @click="handleDialogValue(scope.row.id)"
               />
               <el-popconfirm
-                v-if="scope.row.username != 'fly'"
+                v-if="currentUserPermsShort.includes('system:user:delete')"
                 title="您确定要删除这条记录吗？"
                 @confirm="handleDelete(scope.row.id)"
               >
@@ -184,12 +193,17 @@
                 </template>
               </el-popconfirm>
               <el-popconfirm
-                v-if="scope.row.username != 'fly'"
+                v-if="currentUserPermsShort.includes('system:user:delete')"
                 title="您确定要对这个用户重置密码吗？"
                 @confirm="handleResetPassword(scope.row.id)"
               >
                 <template #reference>
-                  <el-button type="warning" :icon="RefreshRight"
+                  <el-button
+                    type="warning"
+                    :icon="RefreshRight"
+                    v-if="
+                      currentUserPermsShort.includes('system:user:resetPwd')
+                    "
                     >重置密码</el-button
                   >
                 </template>
@@ -247,6 +261,14 @@ import {
 } from "@/api/sys/user";
 
 import { getDeptTreeList } from "@/api/sys/dept";
+import store from "@/store";
+import { onBeforeMount } from "vue";
+
+//页面挂载之前
+onBeforeMount(() => {
+  loadCurrentUserPerms();
+});
+
 const tableData = ref([]);
 
 const total = ref(0);
@@ -271,6 +293,16 @@ const multipleSelection = ref([]);
 const sysRoleList = ref([]);
 
 const roleDialogVisible = ref(false);
+
+//======按钮权限控制======================================================================
+
+//当前用户的菜单权限信息(简要关键信息)
+const currentUserPermsShort = ref([]);
+
+const loadCurrentUserPerms = () => {
+  console.log("loadCurrentUserPerms");
+  currentUserPermsShort.value = store.getters.GET_AUTHLISTSHORT;
+};
 
 //======组织树组件======================================================================
 
@@ -435,6 +467,6 @@ const statusChangeHandle = async (row) => {
 .deptTreeCol {
   border: 1px solid #eedede;
   border-radius: 5px;
-  height: 550px;
+  height: 650px;
 }
 </style>

@@ -235,10 +235,10 @@ const addParamPopoverVisible = ref(false);
 const updateParamPopoverVisible = ref(false);
 
 const handleAddColumn = async (id) => {
-  console.log("typeId.value==", typeId.value);
-  console.log("id==", id);
+  console.log("handleAddColumn.typeId.value==", typeId.value);
+  console.log("handleAddColumn.id==", id);
   const res = await queryDictById(id);
-  // addPopoverForm.value = res.data.sysDictParam;
+  addPopoverForm.value = res.data.sysDictParam;
   addPopoverForm.value.typeId = typeId.value;
 };
 const rules = ref({

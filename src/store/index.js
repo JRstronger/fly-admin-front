@@ -22,6 +22,10 @@ export default createStore({
     GET_USERINFO: state => {
       return JSON.parse(sessionStorage.getItem("userInfo"));
     }
+    ,
+    GET_AUTHLISTSHORT: state => {
+      return JSON.parse(sessionStorage.getItem("authListShort"));
+    }
   },
   mutations: {
     SET_TOKEN: (state, token) => {
@@ -29,6 +33,9 @@ export default createStore({
     },
     SET_MENULIST: (state, menuList) => {
       sessionStorage.setItem("menuList", JSON.stringify(menuList));
+    },
+    SET_AUTHLISTSHORT: (state, authListShort) => {
+      sessionStorage.setItem("authListShort", JSON.stringify(authListShort));
     },
     SET_USERINFO: (state, userInfo) => {
       sessionStorage.setItem("userInfo", JSON.stringify(userInfo));

@@ -26,7 +26,7 @@
   </el-dialog>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { defineEmits, defineProps, ref, watch } from "vue";
 import requestUtil, { getServerUrl } from "@/util/request";
 import { ElMessage } from "element-plus";
@@ -63,9 +63,12 @@ const initFormData = async (id) => {
   const res = await requestUtil.get("sys/menu/treeList");
   treeData.value = res.data.treeMenu;
   form.value.id = id;
-
-  const res2 = await requestUtil.get("sys/role/menus/" + id);
-  treeRef.value.setCheckedKeys(res2.data.menuIdList);
+  if (res.data.code == 200) {
+    const res2 = await requestUtil.get("sys/role/menus/" + id);
+    treeRef.value.setCheckedKeys(res2.data.menuIdList);
+  } else {
+    ElMessage.error(res.data.msg);
+  }
 };
 
 watch(
@@ -107,6 +110,8 @@ const handleConfirm = () => {
     }
   });
 };
+
+//节点选中变化
 </script>
 
 <style scoped>

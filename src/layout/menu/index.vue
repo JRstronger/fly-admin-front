@@ -85,4 +85,10 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.el-menu-vertical-demo .el-menu-item:hover {
+  color: #ffd04b;
+}
+.el-menu-vertical-demo .el-sub-menu:hover {
+  color: #ffd04b;
+}
 </style>
